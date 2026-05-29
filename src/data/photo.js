@@ -1,0 +1,1 @@
+export const ARTIST_PHOTO = "../../public/images/about/about.jpeg"
