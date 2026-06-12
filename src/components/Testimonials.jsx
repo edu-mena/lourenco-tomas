@@ -1,5 +1,6 @@
 import { useScrollReveal } from '../hooks'
-import { TESTIMONIALS, TESTIMONIALS_SECTION } from '../data/content'
+import { TESTIMONIALS } from '../data/content'
+import { TESTIMONIALS_SECTION } from '../data/ui'
 
 function StarIcon() {
   return (
