@@ -1,6 +1,7 @@
 import { useScrollReveal } from '../hooks'
 import { Link } from 'react-router-dom'
 import { ABOUT_SECTION } from '../data/ui'
+import { mediaUrl } from '../data/media'
 
 function ArtCard({ label, desc, img, filterKey }) {
   return (
@@ -33,7 +34,7 @@ export default function About() {
         <div className="about__img-frame">
           <img
             className="about__img"
-            src="/images/about/santuario1.jpeg"
+            src={mediaUrl('/images/about/santuario1.jpeg')}
             alt="Arte — Lourenço Tomas"
             loading="lazy"
           />

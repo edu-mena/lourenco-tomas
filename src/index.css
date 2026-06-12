@@ -210,7 +210,7 @@ body.cursor--hover .cursor__ring {
   display: flex; align-items: center;
   padding: 0 var(--px);
   overflow: hidden;
-  background-image: url('/images/hero/banner.png');
+  background-image: url('https://lightblue-lemur-704992.hostingersite.com/public/images/hero/banner.png');
   background-size: 100% auto;
   background-position: top center;
   background-repeat: no-repeat;
