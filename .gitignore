@@ -1,0 +1,7 @@
+node_modules
+dist
+.vercel
+videos
+public/tributes
+public/videos
+public/images

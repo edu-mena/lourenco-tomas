@@ -1,0 +1,573 @@
+API + Database Guide para Website de Lourenço Tomás
+
+Objetivo
+--------
+Criar uma API backend e uma base de dados que suportem todas as páginas e conteúdos do website atual, permitindo que um painel de administração gerencie e altere tudo de forma centralizada.
+
+Requisitos do Prompt para Criação da API e do Banco de Dados
+------------------------------------------------------------
+Use este conjunto de parâmetros sempre que for gerar ou descrever o backend:
+
+1. Projeto
+   - nome: "Lourenço Tomás Website"
+   - descrição: "API para gerenciamento de site de artista com portfolio, blog, homenagens e pedidos de encomenda."
+   - stack: "Node.js + Express ou Fastify / PostgreSQL ou MySQL / ORM (Prisma, Sequelize ou TypeORM)"
+
+2. Autenticação de Admin
+   - auth_method: "JWT"
+   - admin_user: { email, passwordHash, role }
+   - roles: ["admin", "editor"]
+   - endpoints: ["/auth/login", "/auth/refresh", "/auth/logout"]
+
+3. Banco de Dados
+   - database_type: "relacional"
+   - engine: "MySQL"
+   - nome: "lourenco_tomas"
+   - seed: false (opcional)
+
+4. Frontend / Painel Admin
+   - painel_admin: true
+   - dashboard_url: "/admin"
+   - gerencia: ["Home", "Obras", "Corporativos", "Sobre", "Encomendas", "Contacto", "Homenagens", "Blog"]
+   - media_upload: true
+   - editor_rich_text: true
+
+5. Serviços adicionais
+   - email_service: "SMTP ou SendGrid"
+   - arquivos_estaticos: "CDN ou armazenamento local public/"
+   - upload_media: "local"
+   - cache: "Redis"
+
+Entidades e Modelos de Dados
+----------------------------
+
+1. SiteSettings
+   - id: uuid
+   - siteTitle: string
+   - siteDescription: string
+   - waNumber: string
+   - waDefaultMessage: string
+   - socialLinks: json ou tabela relacionada
+   - updatedAt: datetime
+
+2. NavigationLink
+   - id: uuid
+   - label: string
+   - href: string
+   - order: integer
+
+3. GalleryItem
+   - id: integer ou uuid
+   - slug: string
+   - category: string [tshirts, telas, murais, calcados]
+   - name: string
+   - title: string
+   - subtitle: string
+   - size: string
+   - technique: string
+   - img: string (caminho ou URL)
+   - priceHref: string
+   - height: integer opcional
+   - grad: string CSS opcional
+   - featured: boolean opcional
+   - createdAt, updatedAt
+
+4. GalleryFilter
+   - id: uuid
+   - key: string
+   - label: string
+   - order: integer
+
+5. Testimonial
+   - id: integer ou uuid
+   - text: string
+   - name: string
+   - role: string
+   - avatar: string (texto, imagem ou letra)
+   - order: integer
+
+6. TimelineItem
+   - id: uuid
+   - year: string
+   - event: string
+   - order: integer
+
+7. VideoItem
+   - id: uuid
+   - featured: boolean
+   - label: string
+   - title: string
+   - src: string
+   - grad: string opcional
+   - type: enum [video, youtube, instagram]
+   - duration: string opcional
+   - thumb: string opcional
+   - order: integer
+
+8. SocialLink
+   - id: uuid
+   - icon: string [whatsapp, instagram, facebook, email]
+   - label: string
+   - handle: string
+   - href: string
+   - order: integer
+
+9. Tribute (Homenagem)
+   - id: integer ou uuid
+   - slug: string
+   - featured: boolean
+   - celebrityName: string
+   - celebrityRole: string
+   - celebrityBio: text
+   - celebrityInstagram: string
+   - workTitle: string
+   - workCategory: string
+   - workYear: string
+   - workShortDesc: string
+   - workFullDesc: text[] ou json
+   - specs: json { tecnica, suporte, dimensoes, duracao, ano, verniz }
+   - instagram: string
+   - cover: string
+   - avatar: string
+   - createdAt, updatedAt
+
+10. TributeMedia
+    - id: uuid
+    - tributeId: fk
+    - type: enum [image, video, youtube, instagram_reel]
+    - role: enum [cover, gallery, story, avatar]
+    - src: string
+    - caption: string
+    - width: integer opcional
+    - height: integer opcional
+    - thumb: string opcional
+    - title: string opcional
+    - duration: string opcional
+    - youtubeId: string opcional
+    - reelUrl: string opcional
+    - order: integer
+
+11. TributeStory
+    - id: uuid
+    - tributeId: fk
+    - order: integer
+    - type: enum [image, video, quote, before_after]
+    - src: string opcional
+    - duration: integer opcional
+    - overlay: json { title, subtitle, position }
+    - quoteText: string opcional
+
+12. CorporateCase / CompanyWork
+    - id: uuid
+    - slug: string
+    - name: string
+    - sector: string
+    - cover: string
+    - year: string
+    - desc: string
+    - works: json[] ou tabela filha
+    - order: integer
+
+13. CorporateWorkItem
+    - id: uuid
+    - companyId: fk
+    - title: string
+    - type: string
+    - img: string
+    - year: string
+    - order: integer
+
+14. EncomendaService
+    - id: uuid
+    - icon: string
+    - title: string
+    - desc: string
+    - price: string
+    - includes: string[] ou json
+    - order: integer
+
+15. OrderStep
+    - id: uuid
+    - num: string
+    - title: string
+    - desc: string
+    - order: integer
+
+16. FAQItem
+    - id: uuid
+    - question: string
+    - answer: string
+    - order: integer
+
+17. BlogPost
+    - id: integer ou uuid
+    - slug: string
+    - category: string
+    - date: string
+    - title: string
+    - excerpt: string
+    - img: string
+    - featured: boolean
+    - lead: string
+    - body: json[] (blocos de parágrafo, quote)
+    - relatedSlugs: string[]
+    - updatedAt, createdAt
+
+18. ContactFormOption (opcional)
+    - id: uuid
+    - label: string
+    - value: string
+    - order: integer
+
+19. ContactSubmission (opcional)
+    - id: uuid
+    - name: string
+    - email: string
+    - subject: string
+    - message: text
+    - createdAt: datetime
+    - status: enum [new, read, responded]
+
+20. OrderSubmission (opcional)
+    - id: uuid
+    - name: string
+    - email: string
+    - phone: string
+    - serviceType: string
+    - size: string
+    - deadline: string
+    - description: text
+    - createdAt: datetime
+    - status: enum [new, processing, completed]
+
+Página / Conteúdos Gerenciados
+--------------------------------
+
+1. Página Home (/)
+   - Hero: título, descrição, imagem, elementos de destaque.
+   - Marquee: texto de destaque animado.
+   - About: texto e imagem de apresentação do artista.
+   - Historia: timeline, estatísticas, valores.
+   - Gallery: itens de obra, filtros e cards.
+   - Process: passos do processo criativo, texto explicativo.
+   - Testimonials: depoimentos de clientes.
+   - Contact: formulário de contacto e links sociais.
+   - Footer / WhatsApp: número, mensagem padrão e redes sociais.
+
+2. Página Obras (/obras)
+   - Galeria completa de obras com:
+     - filtro por categoria
+     - múltiplas peças com título, sub-título, técnica, dimensão, imagem de capa
+     - link de preço via WhatsApp
+   - CTA de encomenda
+   - Estatísticas resumidas do portfolio
+
+3. Página Corporativos (/corporativos)
+   - Portfólio de clientes corporativos
+   - Cases de empresas com nome, setor, ano, descrição e imagens de trabalhos
+   - Seções de serviços oferecidos
+   - Processo de criação corporativa em etapas
+
+4. Página Sobre (/sobre)
+   - Biografia completa do artista
+   - Estatísticas de carreira
+   - Valores / pilares do trabalho
+   - Linha do tempo de marcos históricos
+   - CTA para encomendas ou portfolio
+
+5. Página Encomendas (/encomendas)
+   - Lista de serviços disponíveis com preço e features
+   - Passos de funcionamento do pedido
+   - Formulário de encomenda com campos:
+     - nome
+     - email
+     - telefone
+     - tipo de serviço
+     - dimensões/tamanho
+     - prazo desejado
+     - descrição do projeto
+
+6. Página Contacto (/contacto)
+   - Canais de contato e links sociais
+   - Formulário de mensagem com campos:
+     - nome
+     - email
+     - assunto
+     - mensagem
+   - Botão de envio para WhatsApp com mensagem pré-formatada
+
+7. Página Homenagens (/homenagens)
+   - Lista de homenagens com destaque em stories
+   - Cards de cada homenagem com:
+     - cover, avatar, categoria, nome, função e título da obra
+   - Modal de story em formato carrossel
+   - Link para detalhe individual de cada homenagem
+
+8. Página de detalhe de Homenagem (/homenagens/:slug)
+   - Hero com imagem de capa, categoria, nome e função
+   - Texto introdutório e descrição completa
+   - Galeria de imagens relacionadas
+   - Lista de vídeos com preview e reprodução
+   - Especificações técnicas da obra
+   - Links de Instagram e informações do artista
+
+9. Página Blog (/blog)
+   - Lista de posts com filtros por categoria
+   - Destaque para post em primeiro plano
+   - Cards de posts com imagem, categoria, data, título e resumo
+
+10. Página de detalhe de Blog (/blog/:slug)
+   - Hero com imagem e título
+   - Meta de categoria e data
+   - Lead e corpo do texto com parágrafos e citações
+   - Seção de posts relacionados
+   - CTA para encomenda
+
+Dados Estáticos Atuais no Frontend
+----------------------------------
+
+src/data/content.js
+   - NAV_LINKS: [{ label, href }]
+   - WA_NUMBER, WA_DEFAULT_MESSAGE: WhatsApp config
+   - GALLERY_ITEMS: [id, cat, name, title, sub, size, technique, img, priceHref, h, grad]
+   - GALLERY_FILTERS: [key, label]
+   - ART_PALETTE: map category -> array de cores
+   - TESTIMONIALS: [id, text, name, role, avatar]
+   - TIMELINE: [year, event]
+   - VIDEOS: [id, featured, label, title, src, grad]
+   - SOCIAL_LINKS: [id, label, handle, href, icon]
+
+src/data/blog.js
+   - POSTS: [slug, cat, date, title, excerpt, img, featured, lead, body[], related[]]
+     - body items: { type: 'p'|'quote', text }
+
+src/data/photo.js
+   - ARTIST_PHOTO: string path
+
+src/data/tributes.jsx
+   - MEDIA_TYPE, MEDIA_ROLE, STORY_SLIDE_TYPE, CATEGORY: enums
+   - TRIBUTES: [id, slug, featured, celebrity, work, specs, instagram, cover, avatar, gallery, videos, stories]
+     - celebrity: { name, role, bio, instagram }
+     - work: { title, category, year, shortDesc, fullDesc[] }
+     - specs: { técnica, suporte, dimensões, duração, ano, verniz/fixação }
+     - gallery: [id, type, role, src, caption, width, height]
+     - videos: [id, type, role, src, thumb, title, duration]
+     - stories: [id, order, type, src, duration, overlay]
+
+src/components/About.jsx
+   - ARTS: [key, label, desc, img]
+
+src/components/Marquee.jsx
+   - ITEMS: ['T-Shirts','Murais','Telas','Calçados', ...]
+
+src/components/Nav.jsx
+   - NAV_LINKS: [label, to]
+   - menu CTA definido em /encomendas
+
+src/pages/Sobre.jsx
+   - PILLARS: [icon, title, desc]
+   - STATS: [num, label]
+
+src/pages/Corporativos.jsx
+   - COMPANIES: [id, slug, name, sector, cover, year, desc, works[]]
+     - works: [id, title, type, img, year]
+   - WORK_TYPES: ['Todos', 'Mural', 'Retrato', 'Tela', 'Impressão', 'Instalação']
+   - SERVICES: [icon, title, desc, detail]
+   - PROCESS_STEPS: [num, title, desc]
+
+src/pages/Encomendas.jsx
+   - SERVICES: [icon, title, desc, price, includes[]]
+   - STEPS: [num, title, desc]
+   - FAQS: [q, a]
+
+src/pages/Blog.jsx
+   - CATS: ['Todos', 'Processo', 'Homenagens', 'Técnica', 'Bastidores']
+
+Estas são todas as coleções de dados estáticos identificadas no frontend atual. Elas devem ser transformadas em endpoints ou conteúdo dinâmico no backend quando for migrar o site.
+
+Parâmetros de API / Endpoints Recomendados
+-------------------------------------------
+
+Autenticação
+   POST /auth/login
+   POST /auth/refresh
+   POST /auth/logout
+
+Admin
+   GET /admin/dashboard
+   GET /admin/site-settings
+   PUT /admin/site-settings
+
+Navegação
+   GET /navigation
+   POST /navigation
+   PUT /navigation/:id
+   DELETE /navigation/:id
+
+Home
+   GET /home
+   PUT /home/hero
+   PUT /home/marquee
+   PUT /home/about
+   PUT /home/timeline
+   PUT /home/testimonials
+   PUT /home/videos
+
+Obras
+   GET /gallery
+   GET /gallery/:id
+   POST /gallery
+   PUT /gallery/:id
+   DELETE /gallery/:id
+   GET /gallery-filters
+   POST /gallery-filters
+   PUT /gallery-filters/:id
+   DELETE /gallery-filters/:id
+
+Corporativos
+   GET /corporates
+   GET /corporates/:id
+   POST /corporates
+   PUT /corporates/:id
+   DELETE /corporates/:id
+   POST /corporates/:id/works
+   PUT /corporates/:id/works/:workId
+   DELETE /corporates/:id/works/:workId
+
+Sobre
+   GET /about
+   PUT /about/bio
+   PUT /about/stats
+   PUT /about/values
+   PUT /about/timeline
+
+Encomendas
+   GET /orders/services
+   POST /orders/submissions
+   PUT /orders/services/:id
+   DELETE /orders/services/:id
+   GET /orders/steps
+   PUT /orders/steps/:id
+   GET /orders/submissions
+   PUT /orders/submissions/:id/status
+
+Contacto
+   GET /contact/options
+   POST /contact/submissions
+   GET /contact/submissions
+   PUT /contact/submissions/:id/status
+
+Homenagens
+   GET /tributes
+   GET /tributes/:slug
+   POST /tributes
+   PUT /tributes/:id
+   DELETE /tributes/:id
+   POST /tributes/:id/media
+   PUT /tributes/:id/media/:mediaId
+   DELETE /tributes/:id/media/:mediaId
+   POST /tributes/:id/stories
+   PUT /tributes/:id/stories/:storyId
+   DELETE /tributes/:id/stories/:storyId
+
+Blog
+   GET /posts
+   GET /posts/:slug
+   POST /posts
+   PUT /posts/:id
+   DELETE /posts/:id
+   PUT /posts/:id/related
+
+Mídia / Upload
+   POST /media/upload
+   GET /media/:id
+   DELETE /media/:id
+
+Form Submissions
+   GET /submissions/contact
+   GET /submissions/order
+   PUT /submissions/:id/status
+
+Estrutura do Admin Panel
+-------------------------
+
+O painel deve gerenciar:
+   - Conteúdo geral do site e SEO
+   - Menus e links de navegação
+   - Configurações de WhatsApp e redes sociais
+   - Galeria de obras e filtros de categoria
+   - Cases corporativos e trabalhos realizados
+   - Página Sobre e histórico do artista
+   - Serviços e processo de encomenda
+   - Perguntas frequentes
+   - Contato e submissões de mensagens
+   - Homenagens e detalhes de mídia
+   - Blog: posts, featured, tags/categorias e relacionamentos
+   - Submissões recebidas via formulário e pedidos de encomenda
+
+Campos Principais por Página
+-----------------------------
+
+Home
+   hero: title, subtitle, backgroundImage, ctaText, ctaLink
+   marquee: text
+   about: title, description, image
+   historia: timelineItems, stats
+   gallery: featuredItems, categories
+   process: steps, title, description
+   testimonials: text, author, role, avatar
+   contact: formOptions, socialLinks
+
+Obras
+   galleryItems: id, category, name, title, subtitle, size, technique, img, priceHref, height, grad
+   filters: key, label
+   stats: numberOfPieces, categoriesCount, yearsActive
+
+Corporativos
+   companyCases: name, sector, cover, year, desc, works
+   works: title, type, img, year
+   services: title, desc, price, includes
+   processSteps: num, title, desc
+
+Sobre
+   biography: texto longo em parágrafos
+   stats: num, label
+   values: icon, title, desc
+   timeline: year, event
+
+Encomendas
+   services: icon, title, desc, price, includes
+   steps: num, title, desc
+   faq: q, a
+   formFields: nome, email, telefone, serviceType, size, deadline, description
+
+Contacto
+   socialLinks: label, handle, href, icon
+   formFields: nome, email, subject, message
+   whatsappMessageTemplate
+
+Homenagens
+   tribute: slug, featured, celebrity, work, specs, instagram, cover, avatar
+   media: imagens, vídeos e stories com tipo, role, src, caption, duration
+   stories: ordem, tipo, src, overlay, quote
+
+Blog
+   posts: slug, category, date, title, excerpt, img, featured, lead, body, related
+   body: blocos tipados para parágrafo e citação
+
+Prompt de Exemplo para Gerar a API + BD
+---------------------------------------
+Crie uma API backend em Node.js com autenticação JWT para um painel de administração. O banco de dados deve ser relacional (PostgreSQL) e conter tabelas para site settings, navegação, galerias, filtros, depoimentos, timeline, vídeos, links sociais, homenagens, mídia de homenagens, stories, cases corporativos, serviços de encomenda, etapas de encomenda, FAQs, posts de blog, mensagens de contato e submissões de encomenda. A API deve expor endpoints CRUD para todos os conteúdos listados e suportar upload de imagens/vídeos. O painel admin deve permitir alterar todos os textos, imagens, links e blocos do site.
+
+Notas Especiais
+----------------
+- Todo conteúdo deve ser editável via admin.
+- Cada página deve ser reconstruída a partir de dados do backend, não de conteúdo hard-coded.
+- Os campos `slug` devem ser únicos para homenagens e posts.
+- `priceHref` em galleryItems deve ser usado para gerar mensagens do WhatsApp.
+- `socialLinks` e `WA_NUMBER` devem ficar em configurações globais.
+- As submissões de formulários devem ser armazenadas para revisão no painel.
+
+Fim do Guia
+-----------
+Este ficheiro deve servir como referência para quem desenvolver o backend e o painel de administração do website.

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projects\\\\lt-site\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"DIR\"}else{\"FILE\"}}} | Format-Table -AutoSize)",
+      "Bash(npm install *)",
+      "Bash(mkdir \"c:\\\\Projects\\\\lt-site\\\\src\\\\pages\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Projects\\lt-site\\src"
+    ]
+  }
+}
