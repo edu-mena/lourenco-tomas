@@ -37,10 +37,19 @@ export default function Cursor() {
           top: '-200px',
         }}
       >
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <line x1="3" y1="3" x2="10" y2="10" stroke="#d6c2a8" strokeWidth="4" strokeLinecap="round"/>
-          <line x1="10" y1="10" x2="14" y2="14" stroke="#7a6050" strokeWidth="5.5" strokeLinecap="butt"/>
-          <line x1="14" y1="14" x2="25" y2="25" stroke="#c09060" strokeWidth="3" strokeLinecap="round"/>
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          {/* Cerdas — 5 fios curvos que se abrem na ponta e convergem na virola */}
+          <path d="M6 1 Q8 4 12 12" stroke="#bfaa88" strokeWidth="0.8" strokeLinecap="round"/>
+          <path d="M4 2 Q7 5 12 12" stroke="#d6c2a8" strokeWidth="1" strokeLinecap="round"/>
+          <path d="M3 3 Q6 6.5 12 12" stroke="#ecdcbc" strokeWidth="1.4" strokeLinecap="round"/>
+          <path d="M2 4 Q5 7 12 12" stroke="#d6c2a8" strokeWidth="1" strokeLinecap="round"/>
+          <path d="M1 6 Q4 8 12 12" stroke="#bfaa88" strokeWidth="0.8" strokeLinecap="round"/>
+          {/* Virola — banda perpendicular ao eixo 45° */}
+          <line x1="11" y1="14.5" x2="15.5" y2="10" stroke="#4a3828" strokeWidth="4" strokeLinecap="butt"/>
+          <line x1="11" y1="14.5" x2="15.5" y2="10" stroke="#7a5c40" strokeWidth="2" strokeLinecap="butt"/>
+          {/* Cabo com leve curva */}
+          <path d="M15 15 Q21 21 28 28" stroke="#b8844a" strokeWidth="2.5" strokeLinecap="round"/>
+          <path d="M15 15 Q21 21 28 28" stroke="#e0b070" strokeWidth="1" strokeLinecap="round"/>
         </svg>
       </div>
     </>
