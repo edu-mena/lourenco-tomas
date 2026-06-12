@@ -56,33 +56,6 @@ h1, h2, h3, h4, h5, h6 { font-weight: 900; }
 ::-webkit-scrollbar-thumb { background: var(--beige-dark); }
 
 /* ── CUSTOM CURSOR ──────────────────────────────── */
-.cursor {
-  position: fixed; z-index: 9999;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
-}
-.cursor__dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--beige);
-  transition: transform 0.15s var(--ease-out), opacity 0.2s;
-}
-.cursor__ring {
-  position: fixed; z-index: 9998;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  width: 44px; height: 44px;
-  border: 1px solid rgba(214,194,168,0.45);
-  border-radius: 50%;
-  transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out),
-              border-color 0.3s, opacity 0.3s;
-}
-body.cursor--hover .cursor__dot { transform: translate(-50%,-50%) scale(0.4); }
-body.cursor--hover .cursor__ring {
-  width: 64px; height: 64px;
-  border-color: var(--beige);
-}
 
 /* ── SCROLL REVEAL ──────────────────────────────── */
 .reveal {
