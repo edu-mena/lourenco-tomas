@@ -113,17 +113,17 @@ export default function Contact() {
               </div>
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="cf-service">{CONTACT_SECTION.form.fields.service.label}</label>
+              <label className="form-label" htmlFor="cf-service">{CONTACT_SECTION.form.service.label}</label>
               <select id="cf-service" className="form-select">
-                {CONTACT_SECTION.form.fields.service.options.map(option => (
+                {CONTACT_SECTION.form.service.options.map(option => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="cf-msg">{CONTACT_SECTION.form.fields.message.label}</label>
+              <label className="form-label" htmlFor="cf-msg">{CONTACT_SECTION.form.message.label}</label>
               <textarea id="cf-msg" className="form-textarea"
-                placeholder={CONTACT_SECTION.form.fields.message.placeholder} required/>
+                placeholder={CONTACT_SECTION.form.message.placeholder} required/>
             </div>
             <button
               type="submit"

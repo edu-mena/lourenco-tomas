@@ -50,7 +50,7 @@ export default function About() {
         <div ref={cardsRef} className={`art-cards${cardsVisible ? ' art-cards--visible' : ''}`}>
           {ABOUT_SECTION.cards.map((a, i) => (
             <div key={a.key} className="art-cards__item" style={{ '--i': i }}>
-              <ArtCard {...a} filterKey={a.key} />
+              <ArtCard label={a.label} desc={a.desc} img={a.img} filterKey={a.key} />
             </div>
           ))}
         </div>
