@@ -1,0 +1,347 @@
+================================================================================
+  LOVABLE PROMPT — LOURENÇO TOMÁS · ADMIN DASHBOARD
+================================================================================
+
+Build a complete Admin Dashboard for the portfolio website of Lourenço Tomás,
+an Angolan airbrush artist. The dashboard manages all content displayed on the
+public-facing site.
+
+Use React + TypeScript + Tailwind CSS + Shadcn/UI components.
+Use Supabase as the backend (auth + database + storage).
+The overall visual style should be clean, dark-themed (slate-900/slate-800
+backgrounds), with warm amber/gold accents (#c09060) to match the artist brand.
+
+================================================================================
+  AUTHENTICATION
+================================================================================
+
+- Single admin user login (email + password via Supabase Auth)
+- Protected routes — redirect to /login if not authenticated
+- Session persistence
+- Simple logout button in the sidebar header
+
+================================================================================
+  LAYOUT
+================================================================================
+
+- Fixed left sidebar with navigation links grouped by section
+- Top bar with the page title and a breadcrumb
+- Main content area with responsive grid layouts
+- Toast notifications for all CRUD operations (success / error)
+
+Sidebar navigation groups:
+  ★ Priority
+    - Tributes (Homenagens)
+    - Blog Posts (Artigos)
+  ─ Secondary
+    - Gallery
+    - Videos
+    - Testimonials
+    - Corporate Clients
+  ─ Site Settings
+    - Hero
+    - About
+    - Contact
+    - Orders (Encomendas)
+    - Footer & Nav
+
+================================================================================
+  SECTION 1 — TRIBUTES (HOMENAGENS)  ★ PRIORITY
+================================================================================
+
+This is the most complex section. Each tribute is a full artist page dedicated
+to a celebrity portrait painted by Lourenço Tomás.
+
+── 1.1  TRIBUTES LIST PAGE (/admin/tributes) ──
+
+Table columns: Cover thumbnail | Name | Category | Year | Featured (toggle) | Status | Actions
+Actions per row: Edit | Delete (with confirm dialog)
+Top actions: "New Tribute" button (opens create form)
+Filters: by category (Música, Cinema, Desporto, Moda, Arte), by year, search by name
+
+── 1.2  TRIBUTE FORM (create & edit) ──
+
+Organised in tabs:
+
+TAB 1 — BASIC INFO
+  - Name (text)
+  - Slug (auto-generated from name, editable)
+  - Role/subtitle (e.g. "Músico · Semba")
+  - Category (select: Música / Cinema / Desporto / Moda / Arte)
+  - Year (number)
+  - Featured (boolean toggle)
+  - Bio (textarea)
+  - Instagram URL (text)
+  - Cover image URL (text input + preview)
+  - Avatar image URL (text input + preview)
+
+TAB 2 — WORK DESCRIPTION
+  - Work title (text)  e.g. "Aerografia sobre T-Shirt 80×100 cm"
+  - Short description (textarea, 1–2 lines)
+  - Full description (dynamic list of paragraphs — add / remove / reorder text blocks)
+
+TAB 3 — SPECS
+  Key-value pairs (add / remove rows):
+    - Técnica
+    - Suporte
+    - Dimensões
+    - Duração
+    - Ano
+    - Verniz
+  (pre-filled with common values as placeholders)
+
+TAB 4 — GALLERY
+  List of media items. Each item has:
+    - ID (auto)
+    - Type (select: image / video / youtube / instagram_reel)
+    - Role (select: cover / gallery / avatar)
+    - Source URL (text + preview for images)
+    - Title (text, optional)
+    - Duration (text, for videos, e.g. "2:34")
+    - Caption (text, optional)
+    - Sort order (drag-to-reorder handles)
+  Actions per item: Edit inline | Delete
+  Button: "Add Media Item"
+
+TAB 5 — STORIES
+  List of story slides. Each slide has:
+    - Type (select: image / video / quote / before_after)
+    - Source URL (shown when type is image or video)
+    - Caption (text)
+    - Before URL + After URL (shown only when type is before_after)
+    - Sort order (drag-to-reorder)
+  Actions per slide: Edit inline | Delete
+  Button: "Add Story Slide"
+
+── 1.3  DATA MODEL (Supabase tables) ──
+
+tributes
+  id            uuid PK
+  slug          text UNIQUE
+  name          text
+  role          text
+  category      text
+  year          int
+  featured      boolean default false
+  bio           text
+  instagram     text
+  cover_url     text
+  avatar_url    text
+  work_title    text
+  short_desc    text
+  full_desc     jsonb   (array of strings)
+  specs         jsonb   (key-value object)
+  created_at    timestamptz
+
+tribute_media
+  id            uuid PK
+  tribute_id    uuid FK → tributes.id
+  type          text  (image|video|youtube|instagram_reel)
+  role          text  (cover|gallery|avatar)
+  src           text
+  title         text
+  duration      text
+  caption       text
+  sort_order    int
+
+tribute_stories
+  id            uuid PK
+  tribute_id    uuid FK → tributes.id
+  type          text  (image|video|quote|before_after)
+  src           text
+  caption       text
+  before_src    text
+  after_src     text
+  sort_order    int
+
+================================================================================
+  SECTION 2 — BLOG POSTS (ARTIGOS)  ★ PRIORITY
+================================================================================
+
+── 2.1  POSTS LIST PAGE (/admin/blog) ──
+
+Table columns: Thumbnail | Title | Category | Date | Featured | Actions
+Actions: Edit | Delete
+Top actions: "New Post" button
+Filters: by category (Processo, Homenagens, Técnica, Bastidores), search by title
+
+── 2.2  POST FORM (create & edit) ──
+
+Fields:
+  - Title (text)
+  - Slug (auto-generated, editable)
+  - Category (select: Processo / Homenagens / Técnica / Bastidores)
+  - Date (date picker, displayed as "12 Mai 2025" format)
+  - Featured (boolean toggle — only 1 post should be featured at a time; warn if another is already featured)
+  - Cover image URL (text + preview)
+  - Excerpt (textarea, 2–3 lines, shown in card previews)
+  - Lead paragraph (textarea, shown as intro below the post title)
+  - Body content (dynamic block editor):
+      Each block has a type:
+        - "p" — paragraph (textarea)
+        - "quote" — pull quote (textarea with different styling in preview)
+      Actions: Add block | Delete block | Move up / Move down
+  - Related posts (multi-select from existing post slugs, max 3)
+
+── 2.3  DATA MODEL ──
+
+blog_posts
+  id          uuid PK
+  slug        text UNIQUE
+  category    text
+  date        date
+  title       text
+  excerpt     text
+  img_url     text
+  featured    boolean default false
+  lead        text
+  body        jsonb   (array of { type: 'p'|'quote', text: string })
+  related     jsonb   (array of slug strings)
+  created_at  timestamptz
+
+================================================================================
+  SECTION 3 — GALLERY  (implementation guide page)
+================================================================================
+
+Route: /admin/gallery
+
+Show a placeholder page with the following content displayed as a card:
+
+  Title:   "Gallery Items"
+  Purpose: "Controls the work samples shown in the homepage gallery strip
+            and the /obras page grid."
+  Data structure:
+    {
+      id:        string,
+      cat:       string,   // category filter key
+      label:     string,   // display name
+      img:       string,   // remote media URL
+      size:      string,
+      technique: string,
+    }
+  Future implementation notes:
+    - Full CRUD table with image preview
+    - Category filter management
+    - Drag-to-reorder for homepage display order
+
+================================================================================
+  SECTION 4 — VIDEOS  (implementation guide page)
+================================================================================
+
+Route: /admin/videos
+
+Placeholder card:
+
+  Title:   "Videos"
+  Purpose: "Controls the video reel section on the homepage."
+  Data structure:
+    {
+      id:    string,
+      label: string,
+      src:   string,   // remote media URL (.mp4)
+    }
+  Future implementation notes:
+    - List with video URL input + thumbnail preview
+    - Drag-to-reorder
+    - Toggle visibility per video
+
+================================================================================
+  SECTION 5 — TESTIMONIALS  (implementation guide page)
+================================================================================
+
+Route: /admin/testimonials
+
+Placeholder card:
+
+  Title:   "Testimonials"
+  Purpose: "Controls the client quotes shown in the homepage testimonials
+            section."
+  Data structure:
+    {
+      id:     string,
+      text:   string,
+      name:   string,
+      role:   string,
+      avatar: string,  // initials or emoji
+    }
+  Future implementation notes:
+    - Simple CRUD table
+    - Star rating field (1–5)
+    - Toggle visibility
+
+================================================================================
+  SECTION 6 — CORPORATE CLIENTS  (implementation guide page)
+================================================================================
+
+Route: /admin/corporate
+
+Placeholder card:
+
+  Title:   "Corporate Clients (Clientes Corporativos)"
+  Purpose: "Manages the companies listed on the /corporativos page, including
+            their works sub-list."
+  Data structure:
+    Company:
+      { id, slug, name, sector, cover, year, desc, works[] }
+    Work item:
+      { id, title, type, img, year }
+  Future implementation notes:
+    - Two-level CRUD: companies list + nested works per company
+    - Sector taxonomy management
+    - Cover image preview
+
+================================================================================
+  SECTION 7 — SITE SETTINGS  (implementation guide pages)
+================================================================================
+
+Each sub-section below is a separate route showing a placeholder card that
+describes the purpose and fields. No editable form is needed now.
+
+── 7.1  Hero  (/admin/settings/hero) ──
+  Purpose: "Controls the full-screen hero section on the homepage."
+  Fields: title lines (array), subtitle, CTA button labels, scroll label,
+          background image URL.
+
+── 7.2  About  (/admin/settings/about) ──
+  Purpose: "Controls the About section on the homepage and the full /sobre page."
+  Fields: body paragraphs, bio image URL, bio paragraphs, pillars (icon+label+desc),
+          stats (label+value), art cards (label+desc+img per category).
+
+── 7.3  Contact  (/admin/settings/contact) ──
+  Purpose: "Controls the contact section heading, description, form labels,
+            social links, and info cards."
+  Fields: heading, title, body text, WhatsApp number, social links (platform+handle+href),
+          info cards (icon+label+value).
+
+── 7.4  Orders / Encomendas  (/admin/settings/orders) ──
+  Purpose: "Controls the /encomendas page content."
+  Fields: hero text, service cards (icon+label+desc+price), process steps
+          (number+title+desc), FAQ items (question+answer).
+
+── 7.5  Footer & Nav  (/admin/settings/footer) ──
+  Purpose: "Controls the navigation brand name, CTA label, footer quote,
+            and footer links."
+  Fields: logo text, nav CTA label, footer quote, footer links (label+href).
+
+================================================================================
+  GENERAL REQUIREMENTS
+================================================================================
+
+- All URL fields that hold media paths should have a small inline preview
+  (thumbnail for images, a link icon for videos).
+- All delete actions require a confirmation dialog ("Are you sure? This cannot
+  be undone.").
+- Forms should have client-side validation (required fields, URL format).
+- The dashboard should be fully responsive down to tablet (768px).
+- Use optimistic UI updates where possible.
+- All list tables should support pagination (10 rows per page default).
+- Empty states: when a list has no items, show a friendly empty state with a
+  "Create your first X" CTA.
+- The media base URL for all remote assets is:
+    https://lightblue-lemur-704992.hostingersite.com/public
+  Show this as a read-only config field somewhere in settings so the admin
+  knows where assets should be uploaded.
+
+================================================================================
+  END OF PROMPT
+================================================================================

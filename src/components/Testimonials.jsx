@@ -1,6 +1,6 @@
 import { useScrollReveal } from '../hooks'
-import { TESTIMONIALS } from '../data/content'
 import { TESTIMONIALS_SECTION } from '../data/ui'
+import { useTestimonials } from '../hooks/useApi'
 
 function StarIcon() {
   return (
@@ -12,6 +12,7 @@ function StarIcon() {
 
 export default function Testimonials() {
   const [headerRef, headerVisible] = useScrollReveal()
+  const { testimonials } = useTestimonials()
 
   return (
     <section id="testimonials" className="testimonials" aria-label="Depoimentos de Clientes">
@@ -29,7 +30,7 @@ export default function Testimonials() {
       </div>
 
       <div className="testimonials__grid">
-        {TESTIMONIALS.map((t, i) => (
+        {testimonials.map((t, i) => (
           <TestimonialCard key={t.id} item={t} delay={i * 0.12} />
         ))}
       </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { POSTS } from '../data/blog'
+import { usePosts } from '../hooks/useApi'
 import { BLOG_PAGE } from '../data/ui'
 
 export default function Blog() {
@@ -9,7 +9,9 @@ export default function Blog() {
   const [featuredRef, featuredVisible] = useScrollReveal()
   const [gridRef, gridVisible] = useScrollReveal()
 
-  const filtered = filter === 'Todos' ? POSTS : POSTS.filter(p => p.cat === filter)
+  const { posts, loading } = usePosts()
+
+  const filtered = filter === 'Todos' ? posts : posts.filter(p => p.cat === filter)
   const featured = filtered[0] ?? null
   const rest = filtered.slice(1)
 
@@ -41,72 +43,80 @@ export default function Blog() {
         </div>
       </div>
 
-      {/* Featured post */}
-      {featured && (
-        <section className="blog-featured-section">
-          <Link
-            to={`/blog/${featured.slug}`}
-            ref={featuredRef}
-            className={`blog-featured reveal${featuredVisible ? ' visible' : ''}`}
-          >
-            <div className="blog-featured__img-wrap">
-              <img src={featured.img} alt={featured.title} />
-              <div className="blog-featured__shimmer" />
-            </div>
-            <div className="blog-featured__body">
-              <div className="blog-featured__meta">
-                <span className="blog-cat">{featured.cat}</span>
-                <span className="blog-date">{featured.date}</span>
-              </div>
-              <h2 className="blog-featured__title">{featured.title}</h2>
-              <p className="blog-featured__excerpt">{featured.excerpt}</p>
-              <span className="blog-featured__cta">
-                {BLOG_PAGE.featuredCta}
-              </span>
-            </div>
-          </Link>
-        </section>
-      )}
-
-      {/* Grid */}
-      {rest.length > 0 && (
-        <section className="blog-grid-section">
-          <div
-            ref={gridRef}
-            className={`blog-grid${gridVisible ? ' blog-grid--visible' : ''}`}
-          >
-            {rest.map((post, i) => (
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
+          A carregar…
+        </div>
+      ) : (
+        <>
+          {/* Featured post */}
+          {featured && (
+            <section className="blog-featured-section">
               <Link
-                key={post.slug}
-                to={`/blog/${post.slug}`}
-                className="blog-card"
-                style={{ '--i': i }}
+                to={`/blog/${featured.slug}`}
+                ref={featuredRef}
+                className={`blog-featured reveal${featuredVisible ? ' visible' : ''}`}
               >
-                <div className="blog-card__num">
-                  {String(i + 2).padStart(2, '0')}
+                <div className="blog-featured__img-wrap">
+                  <img src={featured.img} alt={featured.title} />
+                  <div className="blog-featured__shimmer" />
                 </div>
-                <div className="blog-card__img">
-                  <img src={post.img} alt={post.title} loading="lazy" />
-                </div>
-                <div className="blog-card__body">
-                  <div className="blog-card__meta">
-                    <span className="blog-cat">{post.cat}</span>
-                    <span className="blog-date">{post.date}</span>
+                <div className="blog-featured__body">
+                  <div className="blog-featured__meta">
+                    <span className="blog-cat">{featured.cat}</span>
+                    <span className="blog-date">{featured.date}</span>
                   </div>
-                  <h3 className="blog-card__title">{post.title}</h3>
-                  <p className="blog-card__excerpt">{post.excerpt}</p>
-                  <span className="blog-card__read">{BLOG_PAGE.cardReadLabel} <span className="blog-arrow">→</span></span>
+                  <h2 className="blog-featured__title">{featured.title}</h2>
+                  <p className="blog-featured__excerpt">{featured.excerpt}</p>
+                  <span className="blog-featured__cta">
+                    {BLOG_PAGE.featuredCta}
+                  </span>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
-      )}
+            </section>
+          )}
 
-      {filtered.length === 0 && (
-        <div className="blog-empty">
-          <p>{BLOG_PAGE.emptyState}</p>
-        </div>
+          {/* Grid */}
+          {rest.length > 0 && (
+            <section className="blog-grid-section">
+              <div
+                ref={gridRef}
+                className={`blog-grid${gridVisible ? ' blog-grid--visible' : ''}`}
+              >
+                {rest.map((post, i) => (
+                  <Link
+                    key={post.slug}
+                    to={`/blog/${post.slug}`}
+                    className="blog-card"
+                    style={{ '--i': i }}
+                  >
+                    <div className="blog-card__num">
+                      {String(i + 2).padStart(2, '0')}
+                    </div>
+                    <div className="blog-card__img">
+                      <img src={post.img} alt={post.title} loading="lazy" />
+                    </div>
+                    <div className="blog-card__body">
+                      <div className="blog-card__meta">
+                        <span className="blog-cat">{post.cat}</span>
+                        <span className="blog-date">{post.date}</span>
+                      </div>
+                      <h3 className="blog-card__title">{post.title}</h3>
+                      <p className="blog-card__excerpt">{post.excerpt}</p>
+                      <span className="blog-card__read">{BLOG_PAGE.cardReadLabel} <span className="blog-arrow">→</span></span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {filtered.length === 0 && (
+            <div className="blog-empty">
+              <p>{BLOG_PAGE.emptyState}</p>
+            </div>
+          )}
+        </>
       )}
     </>
   )

@@ -1,7 +1,6 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useState, useRef } from 'react'
-import { findTributeBySlug, getGalleryImages, getTributeVideos, MEDIA_TYPE } from '../data/tributes'
-import TRIBUTES from '../data/tributes'
+import { useParams, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useTributeBySlug } from '../hooks/useApi'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -41,16 +40,8 @@ function PlayIcon() {
 
 function VideoCard({ video }) {
   const [playing, setPlaying] = useState(false)
-  const previewRef = useRef(null)
 
-  const handlePreviewLoad = () => {
-    const vid = previewRef.current
-    if (!vid) return
-    vid.currentTime = 9.05
-    vid.pause()
-  }
-
-  if (video.type === MEDIA_TYPE.YOUTUBE && playing) {
+  if (video.type === 'youtube' && playing) {
     return (
       <div className="hdet-video-card">
         <div className="hdet-video-card__thumb" style={{ padding: 0, background: '#000' }}>
@@ -71,7 +62,7 @@ function VideoCard({ video }) {
     )
   }
 
-  if (video.type === MEDIA_TYPE.VIDEO && playing) {
+  if (video.type === 'video' && playing) {
     return (
       <div className="hdet-video-card">
         <div className="hdet-video-card__thumb hdet-video-card__thumb--video" style={{ padding: 0, background: '#000' }}>
@@ -94,36 +85,17 @@ function VideoCard({ video }) {
 
   return (
     <div className="hdet-video-card" onClick={() => setPlaying(true)} style={{ cursor: 'pointer' }}>
-      <div className={`hdet-video-card__thumb${video.type === MEDIA_TYPE.VIDEO ? ' hdet-video-card__thumb--video' : ''}`}>
-        {video.type === MEDIA_TYPE.VIDEO ? (
-          <video
-            ref={previewRef}
-            src={video.src}
-            preload="metadata"
-            muted
-            playsInline
-            onLoadedMetadata={handlePreviewLoad}
-            style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'contain', background: '#000' }}
-          />
-        ) : (
+      <div className={`hdet-video-card__thumb${video.type === 'video' ? ' hdet-video-card__thumb--video' : ''}`}>
+        {video.thumb ? (
           <img src={video.thumb} alt={video.title} loading="lazy" />
+        ) : (
+          <div style={{ width: '100%', aspectRatio: '16/9', background: '#1a1a1a' }} />
         )}
         <div className="hdet-video-card__play"><PlayIcon /></div>
-        <span className="hdet-video-card__duration">{video.duration}</span>
+        {video.duration && <span className="hdet-video-card__duration">{video.duration}</span>}
       </div>
       <div className="hdet-video-card__info">
         <p className="hdet-video-card__title">{video.title}</p>
-        {video.type === MEDIA_TYPE.INSTAGRAM && (
-          <a
-            href={video.reelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hdet-video-card__ig-link"
-            onClick={e => e.stopPropagation()}
-          >
-            Ver no Instagram ↗
-          </a>
-        )}
       </div>
     </div>
   )
@@ -158,12 +130,19 @@ function Lightbox({ images, activeIdx, onClose, onNav }) {
 // ─── Main Detail Page ────────────────────────────────────────────
 
 export default function HomenagensDetalhe() {
-  const { slug }    = useParams()
-  const navigate    = useNavigate()
-  const tribute     = findTributeBySlug(slug)
+  const { slug } = useParams()
+  const { tribute, allTributes, loading, error } = useTributeBySlug(slug)
   const [lightboxIdx, setLightboxIdx] = useState(null)
 
-  if (!tribute) {
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0', color: 'rgba(245,245,245,0.35)' }}>
+        A carregar…
+      </div>
+    )
+  }
+
+  if (error || !tribute) {
     return (
       <div className="blog-404">
         <p>Homenagem não encontrada.</p>
@@ -174,14 +153,12 @@ export default function HomenagensDetalhe() {
     )
   }
 
-  const tributeIdx  = TRIBUTES.indexOf(tribute)
-  const prevTribute = TRIBUTES[tributeIdx - 1] ?? null
-  const nextTribute = TRIBUTES[tributeIdx + 1] ?? null
+  const tributeIdx  = allTributes.findIndex(t => t.slug === tribute.slug)
+  const prevTribute = allTributes[tributeIdx - 1] ?? null
+  const nextTribute = allTributes[tributeIdx + 1] ?? null
 
-  // Imagens para galeria (todas as de gallery)
-  const galleryImages = getGalleryImages(tribute)
-  // Vídeos
-  const videos = getTributeVideos(tribute)
+  const galleryImages = tribute.gallery
+  const videos = tribute.videos
 
   const navLightbox = (dir) =>
     setLightboxIdx(prev => (prev + dir + galleryImages.length) % galleryImages.length)
@@ -189,7 +166,7 @@ export default function HomenagensDetalhe() {
   return (
     <>
       {/* Lightbox */}
-      {lightboxIdx !== null && (
+      {lightboxIdx !== null && galleryImages.length > 0 && (
         <Lightbox
           images={galleryImages}
           activeIdx={lightboxIdx}
@@ -229,35 +206,38 @@ export default function HomenagensDetalhe() {
         </section>
 
         {/* Specs */}
-        <section className="hdet-specs">
-          {Object.entries(tribute.specs).map(([k, v]) => (
-            <div key={k} className="hdet-specs__item">
-              <span className="hdet-specs__key">{k}</span>
-              <span className="hdet-specs__val">{v}</span>
-            </div>
-          ))}
-        </section>
-
+        {Object.keys(tribute.specs).length > 0 && (
+          <section className="hdet-specs">
+            {Object.entries(tribute.specs).map(([k, v]) => (
+              <div key={k} className="hdet-specs__item">
+                <span className="hdet-specs__key">{k}</span>
+                <span className="hdet-specs__val">{v}</span>
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* Galeria */}
-        <section className="hdet-gallery">
-          <div className="section-label">Galeria</div>
-          <div className="hdet-gallery__grid">
-            {galleryImages.map((img, i) => (
-              <button
-                key={img.id}
-                className="hdet-gallery__item"
-                onClick={() => setLightboxIdx(i)}
-                aria-label={`Abrir ${img.caption}`}
-              >
-                <img src={img.src} alt={img.caption} loading="lazy" />
-                <div className="hdet-gallery__overlay">
-                  <span className="hdet-gallery__caption">{img.caption}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+        {galleryImages.length > 0 && (
+          <section className="hdet-gallery">
+            <div className="section-label">Galeria</div>
+            <div className="hdet-gallery__grid">
+              {galleryImages.map((img, i) => (
+                <button
+                  key={img.id}
+                  className="hdet-gallery__item"
+                  onClick={() => setLightboxIdx(i)}
+                  aria-label={`Abrir ${img.caption}`}
+                >
+                  <img src={img.src} alt={img.caption} loading="lazy" />
+                  <div className="hdet-gallery__overlay">
+                    <span className="hdet-gallery__caption">{img.caption}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Vídeos */}
         {videos.length > 0 && (

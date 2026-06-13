@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
 import { CORPORATE_PAGE } from '../data/ui'
-import { COMPANIES } from '../data/corporativos'
 import { WA_NUMBER } from '../data/content'
+import { useCompanies } from '../hooks/useApi'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -174,6 +174,8 @@ export default function Corporativos() {
   const [servRef,    servVisible]    = useScrollReveal()
   const [ctaRef,     ctaVisible]     = useScrollReveal()
 
+  const { companies: COMPANIES, loading } = useCompanies()
+
   const allWorks = COMPANIES.flatMap(c =>
     c.works.map(w => ({ ...w, companyName: c.name, companySlug: c.slug }))
   )
@@ -209,6 +211,12 @@ export default function Corporativos() {
         <p className="page-hero__sub">{CORPORATE_PAGE.hero.subtitle}</p>
         <div className="page-hero__deco">{CORPORATE_PAGE.hero.deco}</div>
       </div>
+
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
+          A carregar…
+        </div>
+      )}
 
       {/* ── Stats Strip ── */}
       <div ref={statsRef} className={`corp2-stats reveal${statsVisible ? ' visible' : ''}`}>

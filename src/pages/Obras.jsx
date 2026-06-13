@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { GALLERY_ITEMS, GALLERY_FILTERS } from '../data/content'
+import { GALLERY_FILTERS } from '../data/content'
 import { WORKS_PAGE } from '../data/ui'
 import { GalleryItem, Lightbox } from '../components/ArtCanvas'
+import { useGallery } from '../hooks/useApi'
 
 export default function Obras() {
   const location = useLocation()
@@ -13,6 +14,8 @@ export default function Obras() {
   const [lightboxItem, setLightboxItem] = useState(null)
   const [headerRef, headerVisible] = useScrollReveal()
   const [ctaRef, ctaVisible] = useScrollReveal()
+
+  const { items: GALLERY_ITEMS, loading } = useGallery()
 
   const filtered = filter === 'all'
     ? GALLERY_ITEMS
@@ -76,6 +79,11 @@ export default function Obras() {
           ))}
         </div>
 
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(245,245,245,0.35)' }}>
+            A carregar…
+          </div>
+        ) : (
         <div className="gallery__grid">
           {filtered.map((item, i) => (
             <div
@@ -89,6 +97,7 @@ export default function Obras() {
             </div>
           ))}
         </div>
+        )}
       </section>
 
       {/* ── CTA ───────────────────────────────────── */}

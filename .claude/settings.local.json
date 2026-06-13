@@ -3,7 +3,20 @@
     "allow": [
       "PowerShell(Get-ChildItem -Path \"c:\\\\Projects\\\\lt-site\" -Force | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"DIR\"}else{\"FILE\"}}} | Format-Table -AutoSize)",
       "Bash(npm install *)",
-      "Bash(mkdir \"c:\\\\Projects\\\\lt-site\\\\src\\\\pages\")"
+      "Bash(mkdir \"c:\\\\Projects\\\\lt-site\\\\src\\\\pages\")",
+      "Bash(npm run *)",
+      "Bash(cat vite.config.js)",
+      "Bash(cat vite.config.ts)",
+      "Bash(ls \"c:/Projects/_LourençoTomás-admin/\" 2>&1)",
+      "Read(//c/Projects/**)",
+      "Bash(git -C \"c:/Projects/_LourencoTomas-admin\" status)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m ' *)",
+      "Bash(cat \"c:/Projects/_LourencoTomas-admin/src/routes/_auth.admin.tributes.\\\\$id.tsx\")",
+      "Read(//c/Projects/_LourencoTomas-admin/src/routes/**)",
+      "Bash(cat \"c:/Projects/_LourencoTomas-admin/src/routes/_auth.admin.blog.\\\\$id.tsx\" *)"
     ],
     "additionalDirectories": [
       "c:\\Projects\\lt-site\\src"

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { GALLERY_ITEMS, GALLERY_FILTERS } from '../data/content'
+import { GALLERY_FILTERS } from '../data/content'
 import { GalleryItem, Lightbox } from './ArtCanvas'
 import { GALLERY_SECTION } from '../data/ui'
+import { useGallery } from '../hooks/useApi'
 
 /* ── Gallery Section ───────────────────────────── */
 export default function Gallery() {
@@ -11,9 +12,11 @@ export default function Gallery() {
   const [lightboxItem, setLightboxItem] = useState(null)
   const [headerRef, headerVisible] = useScrollReveal()
 
+  const { items, loading } = useGallery()
+
   const filtered = filter === 'all'
-    ? GALLERY_ITEMS
-    : GALLERY_ITEMS.filter(i => i.cat === filter)
+    ? items
+    : items.filter(i => i.cat === filter)
 
   return (
     <>
@@ -46,19 +49,25 @@ export default function Gallery() {
           ))}
         </div>
 
-        <div className="gallery__grid">
-          {filtered.map((item, i) => (
-            <div
-              key={item.id}
-              style={{
-                opacity: 0,
-                animation: `fadeUp 0.6s var(--ease-out) ${i * 0.06}s forwards`,
-              }}
-            >
-              <GalleryItem item={item} onOpen={setLightboxItem} />
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(245,245,245,0.35)' }}>
+            A carregar…
+          </div>
+        ) : (
+          <div className="gallery__grid">
+            {filtered.map((item, i) => (
+              <div
+                key={item.id}
+                style={{
+                  opacity: 0,
+                  animation: `fadeUp 0.6s var(--ease-out) ${i * 0.06}s forwards`,
+                }}
+              >
+                <GalleryItem item={item} onOpen={setLightboxItem} />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <Lightbox item={lightboxItem} onClose={() => setLightboxItem(null)} />

@@ -1,15 +1,24 @@
 import { useParams, Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { POSTS } from '../data/blog'
+import { usePostBySlug, usePosts } from '../hooks/useApi'
 import { BLOG_POST_PAGE } from '../data/ui'
 
 export default function BlogPost() {
   const { slug } = useParams()
-  const post = POSTS.find(p => p.slug === slug)
+  const { post, loading, error } = usePostBySlug(slug)
+  const { posts } = usePosts()
   const [articleRef, articleVisible] = useScrollReveal()
   const [relatedRef, relatedVisible] = useScrollReveal()
 
-  if (!post) {
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0', color: 'rgba(245,245,245,0.35)' }}>
+        A carregar…
+      </div>
+    )
+  }
+
+  if (error || !post) {
     return (
       <div className="blog-404">
         <p>{BLOG_POST_PAGE.notFound.message}</p>
@@ -19,7 +28,7 @@ export default function BlogPost() {
   }
 
   const relatedPosts = post.related
-    .map(s => POSTS.find(p => p.slug === s))
+    .map(s => posts.find(p => p.slug === s))
     .filter(Boolean)
 
   return (

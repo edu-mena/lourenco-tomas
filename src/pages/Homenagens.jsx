@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
 import TributeStories from '../components/TributeStories'
-import TRIBUTES from '../data/tributes'
+import { useTributes } from '../hooks/useApi'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ function ArrowIcon() {
 
 // ─── Story Modal ─────────────────────────────────────────────────
 
-function StoryModal({ tributes, activeIdx, onIdxChange, onClose }) {
+function StoryModal({ storiesData, activeIdx, onIdxChange, onClose }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
@@ -54,7 +54,7 @@ function StoryModal({ tributes, activeIdx, onIdxChange, onClose }) {
       </button>
       <div className="story-modal__inner" onClick={e => e.stopPropagation()}>
         <TributeStories
-          tributes={tributes}
+          tributes={storiesData}
           activeIdx={activeIdx}
           onIdxChange={onIdxChange}
         />
@@ -71,16 +71,31 @@ export default function Homenagens() {
   const [storyOpen, setStoryOpen] = useState(false)
   const [storyIdx,  setStoryIdx]  = useState(0)
 
-  const openStory = (i) => { setStoryIdx(i); setStoryOpen(true) }
+  const { tributes, loading } = useTributes()
 
-  const featured = TRIBUTES.filter(t => t.featured)
+  const featured = tributes.filter(t => t.featured)
+
+  // Flat shape expected by TributeStories
+  const storiesData = tributes.map(t => ({
+    id: t.id,
+    img: t.cover,
+    video: null,
+    celebrity: t.celebrity.name,
+    category: t.work.category,
+    role: t.celebrity.role,
+    title: t.work.title,
+    desc: t.work.shortDesc,
+    instagram: t.instagram,
+  }))
+
+  const openStory = (i) => { setStoryIdx(i); setStoryOpen(true) }
 
   return (
     <>
       {/* Story Modal */}
       {storyOpen && (
         <StoryModal
-          tributes={TRIBUTES}
+          storiesData={storiesData}
           activeIdx={storyIdx}
           onIdxChange={setStoryIdx}
           onClose={() => setStoryOpen(false)}
@@ -99,78 +114,85 @@ export default function Homenagens() {
         <div className="page-hero__deco">HON</div>
       </div>
 
-      {/* Destaques — circular avatars */}
-      <section className="hom-featured-section">
-        <div className="hom-featured-header">
-          <div className="section-label">Destaques</div>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
+          A carregar…
         </div>
-        <div className="hom-featured-grid">
-          {featured.map((t, i) => (
-            <button
-              key={t.id}
-              className="hom-avatar-card"
-              style={{ '--i': i }}
-              onClick={() => openStory(TRIBUTES.indexOf(t))}
-              aria-label={`Ver story de ${t.celebrity.name}`}
-            >
-              <div className="hom-avatar-card__ring">
-                <div className="hom-avatar-card__img-wrap">
-                  {/* Usa avatar se existir, caso contrário cover */}
-                  <img src={t.avatar ?? t.cover} alt={t.celebrity.name} loading="lazy" />
-                </div>
-              </div>
-              <span className="hom-avatar-card__cat">{t.work.category}</span>
-              <span className="hom-avatar-card__name">{t.celebrity.name}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Full Grid */}
-      <section className="hom-grid-section">
-        <div className="hom-grid-header">
-          <div className="section-label">Todas as Homenagens</div>
-          <p className="hom-grid-sub">
-            Clique no ícone de story para ver o processo em formato Stories, ou na obra para ver o detalhe completo.
-          </p>
-        </div>
-
-        <div
-          ref={gridRef}
-          className={`hom-grid hom-grid--new${gridVisible ? ' hom-grid--visible' : ''}`}
-        >
-          {TRIBUTES.map((t, i) => (
-            <div key={t.id} className="hom-card" style={{ '--i': i }}>
-              {/* Thumbnail */}
-              <div className="hom-card__thumb-wrap">
-                <img src={t.cover} alt={t.celebrity.name} loading="lazy" className="hom-card__thumb" />
+      ) : (
+        <>
+          {/* Destaques — circular avatars */}
+          <section className="hom-featured-section">
+            <div className="hom-featured-header">
+              <div className="section-label">Destaques</div>
+            </div>
+            <div className="hom-featured-grid">
+              {featured.map((t, i) => (
                 <button
-                  className="hom-card__story-btn"
-                  onClick={() => openStory(i)}
+                  key={t.id}
+                  className="hom-avatar-card"
+                  style={{ '--i': i }}
+                  onClick={() => openStory(tributes.indexOf(t))}
                   aria-label={`Ver story de ${t.celebrity.name}`}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="16" height="16">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
-                  </svg>
-                  Story
+                  <div className="hom-avatar-card__ring">
+                    <div className="hom-avatar-card__img-wrap">
+                      <img src={t.avatar ?? t.cover} alt={t.celebrity.name} loading="lazy" />
+                    </div>
+                  </div>
+                  <span className="hom-avatar-card__cat">{t.work.category}</span>
+                  <span className="hom-avatar-card__name">{t.celebrity.name}</span>
                 </button>
-              </div>
-
-              {/* Body */}
-              <div className="hom-card__body">
-                <span className="hom-card__cat">{t.work.category}</span>
-                <h3 className="hom-card__name">{t.celebrity.name}</h3>
-                <p className="hom-card__role">{t.celebrity.role}</p>
-                <p className="hom-card__work">{t.work.title}</p>
-                <Link to={`/homenagens/${t.slug}`} className="hom-card__link">
-                  Ver detalhe <ArrowIcon />
-                </Link>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
+
+          {/* Full Grid */}
+          <section className="hom-grid-section">
+            <div className="hom-grid-header">
+              <div className="section-label">Todas as Homenagens</div>
+              <p className="hom-grid-sub">
+                Clique no ícone de story para ver o processo em formato Stories, ou na obra para ver o detalhe completo.
+              </p>
+            </div>
+
+            <div
+              ref={gridRef}
+              className={`hom-grid hom-grid--new${gridVisible ? ' hom-grid--visible' : ''}`}
+            >
+              {tributes.map((t, i) => (
+                <div key={t.id} className="hom-card" style={{ '--i': i }}>
+                  {/* Thumbnail */}
+                  <div className="hom-card__thumb-wrap">
+                    <img src={t.cover} alt={t.celebrity.name} loading="lazy" className="hom-card__thumb" />
+                    <button
+                      className="hom-card__story-btn"
+                      onClick={() => openStory(i)}
+                      aria-label={`Ver story de ${t.celebrity.name}`}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="16" height="16">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
+                      </svg>
+                      Story
+                    </button>
+                  </div>
+
+                  {/* Body */}
+                  <div className="hom-card__body">
+                    <span className="hom-card__cat">{t.work.category}</span>
+                    <h3 className="hom-card__name">{t.celebrity.name}</h3>
+                    <p className="hom-card__role">{t.celebrity.role}</p>
+                    <p className="hom-card__work">{t.work.title}</p>
+                    <Link to={`/homenagens/${t.slug}`} className="hom-card__link">
+                      Ver detalhe <ArrowIcon />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Instagram CTA */}
       <section
