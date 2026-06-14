@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useScrollReveal } from '../hooks'
-import { VIDEOS } from '../data/content'
+import { useVideos } from '../hooks/useApi'
 import { PROCESS_SECTION } from '../data/ui'
 
 export default function Process() {
   const [headerRef, headerVisible] = useScrollReveal()
   const [gridRef, gridVisible] = useScrollReveal()
   const [selectedVideo, setSelectedVideo] = useState(null)
+  const { videos: rawVideos } = useVideos()
+  const videos = [...rawVideos].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 
   const handlePlayClick = (video) => {
     setSelectedVideo(video)
@@ -42,7 +44,7 @@ export default function Process() {
           className={`process__grid reveal${gridVisible ? ' visible' : ''}`}
           style={{ transitionDelay: '0.15s' }}
         >
-          {VIDEOS.map(v => (
+          {videos.map(v => (
             <div
               key={v.id}
               className={`video-card${v.featured ? ' video-card--featured' : ''}`}
