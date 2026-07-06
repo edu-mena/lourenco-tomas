@@ -16,7 +16,14 @@
       "Bash(git commit -m ' *)",
       "Bash(cat \"c:/Projects/_LourencoTomas-admin/src/routes/_auth.admin.tributes.\\\\$id.tsx\")",
       "Read(//c/Projects/_LourencoTomas-admin/src/routes/**)",
-      "Bash(cat \"c:/Projects/_LourencoTomas-admin/src/routes/_auth.admin.blog.\\\\$id.tsx\" *)"
+      "Bash(cat \"c:/Projects/_LourencoTomas-admin/src/routes/_auth.admin.blog.\\\\$id.tsx\" *)",
+      "Bash(awk '/\\\\.sobre-values__grid/,/@media/ {print NR\": \"$0}' src/index.css)",
+      "Bash(awk '/@media/,/^}/' src/index.css)",
+      "Bash(sleep 2; cat /tmp/vite.log)",
+      "Read(//tmp/**)",
+      "Bash(command -v chromium-cli)",
+      "Bash(timeout 15 curl -sI https://registry.npmjs.org)",
+      "Bash(echo \"EXIT:$?\")"
     ],
     "additionalDirectories": [
       "c:\\Projects\\lt-site\\src"
