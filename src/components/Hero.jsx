@@ -10,6 +10,7 @@ export default function Hero() {
 
   return (
     <section id="hero" className="hero" data-spray>
+      <img className="hero__img" src={HERO_CONTENT.image} alt={HERO_CONTENT.imageAlt} fetchpriority="high" decoding="async" />
       <div className="hero__overlay" />
 
       <div className="hero__content">

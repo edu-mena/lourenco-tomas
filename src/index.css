@@ -272,31 +272,55 @@ main:focus { outline: none; }
 .hero {
   position: relative;
   min-height: calc(100vh - var(--nav-height));
+  min-height: calc(100svh - var(--nav-height));
   margin-top: var(--nav-height);
   display: flex; align-items: center;
   padding: 0 var(--px);
   overflow: hidden;
-  background-image: url('https://lightblue-lemur-704992.hostingersite.com/public/images/hero/banner.png');
-  background-size: cover;
-  background-position: center 20%;
-  background-repeat: no-repeat;
+  background: var(--ink);
+}
+/* Retrato vertical: no desktop ocupa a metade direita, o texto fica à esquerda */
+.hero__img {
+  position: absolute; top: 0; right: 0; bottom: 0; z-index: 0;
+  width: min(58%, 980px);
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  animation: fadeIn 1.2s var(--ease-out) both;
 }
 .hero__overlay {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(
-    135deg,
-    rgba(13,13,13,0.75) 0%,
-    rgba(13,13,13,0.35) 55%,
-    rgba(13,13,13,0.55) 100%
-  );
+  background:
+    linear-gradient(0deg, rgba(13,13,13,0.7) 0%, transparent 28%),
+    linear-gradient(90deg, var(--ink) 0%, var(--ink) 40%, rgba(13,13,13,0.55) 52%, rgba(13,13,13,0) 72%);
+}
+@media (min-width: 1600px) {
+  .hero__overlay {
+    background:
+      linear-gradient(0deg, rgba(13,13,13,0.7) 0%, transparent 28%),
+      linear-gradient(90deg, var(--ink) 0%, var(--ink) calc(100% - 980px), rgba(13,13,13,0.55) calc(100% - 860px), rgba(13,13,13,0) calc(100% - 620px));
+  }
+}
+/* Tablet em vertical: foto em ecrã inteiro com o rosto em cima, texto em baixo.
+   Em horizontal mantém-se o layout de desktop (foto à direita). */
+@media (max-width: 900px) and (orientation: portrait) {
+  .hero { align-items: flex-end; }
+  .hero__img { width: 100%; object-position: center 12%; }
+  .hero__overlay {
+    background: linear-gradient(180deg,
+      rgba(13,13,13,0.25) 0%, rgba(13,13,13,0) 22%,
+      rgba(13,13,13,0.55) 52%, rgba(13,13,13,0.92) 74%, var(--ink) 100%);
+  }
 }
 .hero__content {
   position: relative; z-index: 2;
   display: flex; flex-direction: column;
   padding-top: clamp(40px, 6vw, 72px);
   padding-bottom: clamp(40px, 6vw, 72px);
-  max-width: 680px;
+  /* nunca invade a foto, que começa a 42% da largura */
+  max-width: min(680px, calc(42vw - var(--px)));
 }
+.hero__title { font-size: clamp(2.6rem, min(7.4vw, 15vh), 8rem); }
 .hero__eyebrow {
   font-size: 0.78rem;
   font-weight: 500;
@@ -3650,6 +3674,40 @@ main:focus { outline: none; }
   letter-spacing: 0.02em;
 }
 
+@media (max-width: 900px) and (orientation: portrait) {
+  .hero__content { padding-bottom: 40px; max-width: none; }
+  .hero__title { font-size: clamp(3.4rem, 14vw, 6rem); }
+  .hero__scroll { display: none; }
+}
+/* Telemóvel em vertical: a foto é um bloco no topo e o texto só sobrepõe
+   a parte de baixo (fato) — o rosto nunca fica tapado, mesmo em ecrãs baixos */
+@media (max-width: 600px) and (orientation: portrait) {
+  .hero {
+    flex-direction: column; align-items: stretch;
+    min-height: 0;
+    padding-bottom: 12px;
+  }
+  .hero__img {
+    position: relative; top: auto; right: auto; bottom: auto;
+    width: calc(100% + 2 * var(--px));
+    max-width: none;
+    margin: 0 calc(-1 * var(--px));
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-position: center 14%;
+  }
+  .hero__overlay {
+    background: linear-gradient(180deg,
+      rgba(13,13,13,0.2) 0, rgba(13,13,13,0) 22vw,
+      rgba(13,13,13,0) 62vw, rgba(13,13,13,0.85) 100vw, var(--ink) 125vw);
+  }
+  .hero__content { margin-top: -40vw; padding-top: 0; }
+}
+/* Telemóvel em horizontal: título proporcional à altura */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hero__subtitle { margin-bottom: 20px; font-size: 1.05rem; }
+  .hero__scroll { display: none; }
+}
 @media (max-width: 480px) {
   .hero__cta-wrap { flex-direction: column; align-items: stretch; max-width: 320px; }
   .hero__cta-wrap > * { justify-content: center; }
