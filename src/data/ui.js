@@ -331,7 +331,7 @@ export const ABOUT_PAGE = {
 /* /contactos — página de links para a bio do Instagram */
 export const LINKS_PAGE = {
   name: 'Lourenço Tomás',
-  bio: '— artista visual e plástico angolano, especialista em aerografia. Fundador da AOVC Creative e CEO da Mente e Cor.',
+  bio: '— artista visual e plástico angolano, especialista em aerografia. Fundador da AOVC Creative e CEO na empresa Mente e Cor.',
   title: 'Clique nos ícones para interagir',
 }
 
