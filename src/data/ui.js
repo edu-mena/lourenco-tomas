@@ -42,9 +42,7 @@ export const SERVICE_OPTIONS = [
 export const HERO_CONTENT = {
   image: mediaUrl('/images/hero/hero.jpeg'),
   imageAlt: 'Lourenço Tomás no ateliê',
-  eyebrow: 'Aerografia · Luanda, Angola',
   title: ['Lourenço', 'Tomás'],
-  subtitle: 'T-shirts, telas, murais e calçado pintados à mão com aerógrafo. Cada peça é feita uma única vez.',
   ctaPrimary: 'Ver obras',
   ctaSecondary: 'Encomendar',
   scrollLabel: 'Continuar',

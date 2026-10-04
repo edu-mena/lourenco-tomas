@@ -320,41 +320,19 @@ main:focus { outline: none; }
   /* nunca invade a foto, que começa a 42% da largura */
   max-width: min(680px, calc(42vw - var(--px)));
 }
-.hero__title { font-size: clamp(2.6rem, min(7.4vw, 15vh), 8rem); }
-.hero__eyebrow {
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--beige);
-  margin-bottom: 20px;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease-out) 0.3s forwards;
-}
 .hero__title {
   font-family: var(--ff-display);
-  font-size: clamp(3.6rem, 9vw, 8rem);
+  font-size: clamp(2.6rem, min(7.4vw, 15vh), 8rem);
   font-weight: 400;
   line-height: 0.92;
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--white);
-  margin-bottom: 18px;
+  margin-bottom: clamp(24px, 4vh, 40px);
   opacity: 0;
   animation: fadeUp 0.9s var(--ease-out) 0.4s forwards;
 }
 .hero__title span { color: var(--beige); font-weight: 400; }
-.hero__subtitle {
-  font-family: var(--ff-serif);
-  font-style: italic;
-  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
-  line-height: 1.5;
-  color: rgba(255,255,255,0.8);
-  max-width: 440px;
-  margin-bottom: 36px;
-  opacity: 0;
-  animation: fadeUp 0.9s var(--ease-out) 0.55s forwards;
-}
 .hero__cta-wrap {
   display: flex; gap: 14px; flex-wrap: wrap;
   opacity: 0;
@@ -3705,7 +3683,6 @@ main:focus { outline: none; }
 }
 /* Telemóvel em horizontal: título proporcional à altura */
 @media (max-height: 520px) and (orientation: landscape) {
-  .hero__subtitle { margin-bottom: 20px; font-size: 1.05rem; }
   .hero__scroll { display: none; }
 }
 @media (max-width: 480px) {

@@ -32,7 +32,7 @@ export function AdminDataProvider({ children }) {
   const [testimonials, setTestimonials] = useState(INITIAL_TESTIMONIALS)
   const [companies,    setCompanies]    = useState(INITIAL_COMPANIES)
   const [siteSettings, setSiteSettings] = useState({
-    hero:    { ...HERO_CONTENT },
+    hero:    { subtitle: '', ...HERO_CONTENT },
     about:   { section: { ...ABOUT_SECTION }, page: { ...ABOUT_PAGE } },
     footer:  { quote: '', ...FOOTER_CONTENT },
     nav:     { ...NAV_BRAND },

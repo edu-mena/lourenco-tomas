@@ -14,7 +14,6 @@ export default function Hero() {
       <div className="hero__overlay" />
 
       <div className="hero__content">
-        <p className="hero__eyebrow">{HERO_CONTENT.eyebrow}</p>
         <h1 className="hero__title">
           {HERO_CONTENT.title.map((line, index) => (
             <Fragment key={index}>
@@ -23,8 +22,6 @@ export default function Hero() {
             </Fragment>
           ))}
         </h1>
-
-        <p className="hero__subtitle">{HERO_CONTENT.subtitle}</p>
 
         <div className="hero__cta-wrap">
           <button className="btn-primary" onClick={scrollToGallery}>
