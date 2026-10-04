@@ -328,6 +328,13 @@ export const ABOUT_PAGE = {
   },
 }
 
+/* /contactos — página de links para a bio do Instagram */
+export const LINKS_PAGE = {
+  name: 'Lourenço Tomás',
+  bio: 'é artista plástico em Luanda. Aprendeu a pintar na oficina do pai e hoje cria à mão, com aerógrafo, t-shirts, telas, murais e calçado.',
+  title: 'Clique nos ícones para interagir',
+}
+
 export const WORKS_PAGE = {
   hero: {
     breadcrumb: 'Obras',

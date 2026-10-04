@@ -3657,37 +3657,69 @@ main:focus { outline: none; }
 
 /* ═══════════════════════════════════════════════════════
    /contactos — página de links (sem Nav nem Footer)
+   Altura fixa = ecrã; a foto é o único elemento elástico.
    ═══════════════════════════════════════════════════════ */
 .links-page {
-  min-height: 100vh;
-  min-height: 100dvh;
+  --gap: 10px;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: var(--gap);
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: clamp(32px, 6vh, 48px);
-  padding: 32px 16px;
+  gap: clamp(12px, 2.4vh, 22px);
+  overflow: hidden;
   text-align: center;
-  background: radial-gradient(ellipse 70% 50% at 50% 40%, rgba(214,194,168,0.07), transparent 70%), var(--ink);
+}
+.links-page__photo {
+  flex: 1 1 0;
+  min-height: 0;               /* deixa a foto encolher em ecrãs baixos */
+  width: 100%;
+  object-fit: cover;
+  object-position: center 22%; /* mantém o rosto no enquadramento */
+  border-radius: 18px;
+  background: var(--ink-3);
+  animation: fadeIn 0.6s var(--ease-out) both;
+}
+.links-page__bio {
+  flex: none;
+  padding: 0 var(--gap);
+  font-size: clamp(0.92rem, 3.6vw, 1rem);
+  line-height: 1.5;
+  color: rgba(245,245,245,0.75);
+  /* rede de segurança: nunca mais de 3 linhas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  animation: cellIn 0.6s var(--ease-out) 0.1s both;
+}
+.links-page__bio strong { font-weight: 500; color: var(--beige); }
+.links-page__actions {
+  flex: none;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(10px, 1.8vh, 16px);
+  padding-bottom: clamp(4px, 1.5vh, 16px);
 }
 .links-page__title {
   font-family: var(--ff-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  font-size: clamp(1.15rem, 4.6vw, 1.4rem);
   line-height: 1.2;
   color: var(--ivory);
-  max-width: 16ch;
-  animation: cellIn 0.7s var(--ease-out) both;
+  animation: cellIn 0.6s var(--ease-out) 0.15s both;
 }
 .links-page__list {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: clamp(16px, 5vw, 28px);
+  display: flex; justify-content: center;
+  gap: clamp(14px, 5vw, 24px);
 }
 .links-page__list li {
   animation: cellIn 0.6s var(--ease-out) both;
-  animation-delay: calc(0.15s + var(--i, 0) * 0.08s);
+  animation-delay: calc(0.25s + var(--i, 0) * 0.08s);
 }
 .links-page__btn {
-  width: clamp(72px, 22vw, 88px);
+  width: clamp(56px, 16vw, 68px);
   aspect-ratio: 1;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
