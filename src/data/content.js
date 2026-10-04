@@ -9,9 +9,8 @@ export const WA_DEFAULT_MESSAGE = 'Olá Lourenço! Gostaria de encomendar uma pe
 export const CONTACT_EMAIL = 'lourencotomas_@aovc.ao'
 export const INSTAGRAM_HANDLE = '@lourencotomas_'
 export const INSTAGRAM_URL = 'https://www.instagram.com/lourencotomas_/'
-/* Substituir pelo link exacto do ateliê no Google Maps quando houver */
 export const LOCATION_LABEL = 'Luanda, Angola'
-export const LOCATION_URL = 'https://www.google.com/maps/search/?api=1&query=Luanda%2C+Angola'
+export const LOCATION_URL = 'https://maps.app.goo.gl/QrYBojUmtxXo7uWE7'
 const encodeWaMessage = (text) => encodeURIComponent(text)
 
 export const GALLERY_ITEMS = [
