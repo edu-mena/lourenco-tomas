@@ -1,7 +1,36 @@
+import { useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
 import { usePostBySlug, usePosts } from '../hooks/useApi'
 import { BLOG_POST_PAGE } from '../data/ui'
+import { IconArrow } from '../components/icons'
+
+/* Barra fina no topo que mostra quanto do artigo já foi lido */
+function ReadingProgress({ targetRef }) {
+  const barRef = useRef(null)
+  useEffect(() => {
+    let raf = null
+    const update = () => {
+      raf = null
+      const el = targetRef.current
+      if (!el || !barRef.current) return
+      const r = el.getBoundingClientRect()
+      const total = r.height - window.innerHeight
+      const p = total > 0 ? Math.min(Math.max(-r.top / total, 0), 1) : 1
+      barRef.current.style.transform = `scaleX(${p})`
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      cancelAnimationFrame(raf)
+    }
+  }, [targetRef])
+  return <div className="reading-progress" aria-hidden="true"><div ref={barRef} className="reading-progress__bar" /></div>
+}
 
 export default function BlogPost() {
   const { slug } = useParams()
@@ -9,11 +38,14 @@ export default function BlogPost() {
   const { posts } = usePosts()
   const [articleRef, articleVisible] = useScrollReveal()
   const [relatedRef, relatedVisible] = useScrollReveal()
+  const bodyRef = useRef(null)
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '120px 0', color: 'rgba(245,245,245,0.35)' }}>
-        A carregar…
+      <div className="bpost-loading" aria-busy="true" aria-label="A carregar">
+        <div className="skeleton bpost-loading__hero" />
+        <div className="skeleton bpost-loading__line" />
+        <div className="skeleton bpost-loading__line bpost-loading__line--short" />
       </div>
     )
   }
@@ -22,7 +54,7 @@ export default function BlogPost() {
     return (
       <div className="blog-404">
         <p>{BLOG_POST_PAGE.notFound.message}</p>
-        <Link to="/blog" className="btn-ghost">{BLOG_POST_PAGE.notFound.backLabel}</Link>
+        <Link to="/blog" className="btn-outline">{BLOG_POST_PAGE.notFound.backLabel}</Link>
       </div>
     )
   }
@@ -33,12 +65,13 @@ export default function BlogPost() {
 
   return (
     <>
+      <ReadingProgress targetRef={bodyRef} />
       {/* Hero image */}
       <div className="bpost-hero">
-        <img src={post.img} alt={post.title} />
+        <img src={post.img} alt="" />
         <div className="bpost-hero__grad" />
         <div className="bpost-hero__back">
-          <Link to="/blog" className="bpost-back-link">← Blog</Link>
+          <Link to="/blog" className="bpost-back-link"><IconArrow size={14} dir="left" /> Blog</Link>
         </div>
       </div>
 
@@ -57,7 +90,7 @@ export default function BlogPost() {
 
         <p className="bpost-lead">{post.lead}</p>
 
-        <div className="bpost-body">
+        <div className="bpost-body" ref={bodyRef}>
           {post.body.map((block, i) =>
             block.type === 'quote' ? (
               <blockquote key={i} className="bpost-quote">
@@ -77,7 +110,7 @@ export default function BlogPost() {
           <p className="bpost-cta__desc">
             {BLOG_POST_PAGE.cta.description}
           </p>
-          <Link to="/encomendas" className="btn-primary">{BLOG_POST_PAGE.cta.button}</Link>
+          <Link to="/encomendas" className="btn-primary">{BLOG_POST_PAGE.cta.button} <IconArrow size={15} /></Link>
         </div>
       </article>
 
@@ -100,7 +133,7 @@ export default function BlogPost() {
                 style={{ '--i': i }}
               >
                 <div className="blog-card__img">
-                  <img src={p.img} alt={p.title} loading="lazy" />
+                  <img src={p.img} alt="" loading="lazy" />
                 </div>
                 <div className="blog-card__body">
                   <div className="blog-card__meta">

@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
 import { usePosts } from '../hooks/useApi'
 import { BLOG_PAGE } from '../data/ui'
+import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
+import { IconArrow } from '../components/icons'
 
 export default function Blog() {
   const [filter, setFilter] = useState('Todos')
   const [featuredRef, featuredVisible] = useScrollReveal()
   const [gridRef, gridVisible] = useScrollReveal()
 
-  const { posts, loading } = usePosts()
+  const { posts, loading, error, reload } = usePosts()
 
   const filtered = filter === 'Todos' ? posts : posts.filter(p => p.cat === filter)
   const featured = filtered[0] ?? null
@@ -17,16 +19,7 @@ export default function Blog() {
 
   return (
     <>
-      <div className="page-hero">
-        <p className="page-hero__breadcrumb">
-          <Link to="/">Início</Link> / Blog
-        </p>
-        <h1 className="page-hero__title">Blog</h1>
-        <p className="page-hero__sub">
-          Processo criativo, bastidores e histórias por trás de cada obra.
-        </p>
-        <div className="page-hero__deco">BLG</div>
-      </div>
+      <PageHero {...BLOG_PAGE.hero} />
 
       {/* Filter bar */}
       <div className="blog-filters-wrap">
@@ -34,6 +27,7 @@ export default function Blog() {
           {BLOG_PAGE.filters.map(c => (
             <button
               key={c}
+              aria-pressed={filter === c}
               className={`blog-filter-btn${filter === c ? ' active' : ''}`}
               onClick={() => setFilter(c)}
             >
@@ -44,9 +38,9 @@ export default function Blog() {
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
-          A carregar…
-        </div>
+        <section className="blog-grid-section"><SkeletonGrid count={3} variant="cards" /></section>
+      ) : error ? (
+        <ErrorState message="Não foi possível carregar os artigos." onRetry={reload} />
       ) : (
         <>
           {/* Featured post */}
@@ -58,7 +52,7 @@ export default function Blog() {
                 className={`blog-featured reveal${featuredVisible ? ' visible' : ''}`}
               >
                 <div className="blog-featured__img-wrap">
-                  <img src={featured.img} alt={featured.title} />
+                  <img src={featured.img} alt="" />
                   <div className="blog-featured__shimmer" />
                 </div>
                 <div className="blog-featured__body">
@@ -69,7 +63,7 @@ export default function Blog() {
                   <h2 className="blog-featured__title">{featured.title}</h2>
                   <p className="blog-featured__excerpt">{featured.excerpt}</p>
                   <span className="blog-featured__cta">
-                    {BLOG_PAGE.featuredCta}
+                    {BLOG_PAGE.featuredCta} <IconArrow size={14} />
                   </span>
                 </div>
               </Link>
@@ -94,7 +88,7 @@ export default function Blog() {
                       {String(i + 2).padStart(2, '0')}
                     </div>
                     <div className="blog-card__img">
-                      <img src={post.img} alt={post.title} loading="lazy" />
+                      <img src={post.img} alt="" loading="lazy" />
                     </div>
                     <div className="blog-card__body">
                       <div className="blog-card__meta">

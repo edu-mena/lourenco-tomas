@@ -1,56 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
+import { useModal } from '../hooks/useModal'
 import TributeStories from '../components/TributeStories'
 import { useTributes } from '../hooks/useApi'
-
-// ─── Icons ──────────────────────────────────────────────────────
-
-function IgIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 18, height: 18 }}>
-      <rect x="2" y="2" width="20" height="20" rx="5"/>
-      <circle cx="12" cy="12" r="4"/>
-      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="22" height="22">
-      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  )
-}
-
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16">
-      <line x1="5" y1="12" x2="19" y2="12"/>
-      <polyline points="12 5 19 12 12 19"/>
-    </svg>
-  )
-}
+import { TRIBUTES_PAGE } from '../data/ui'
+import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
+import { IconArrow, IconClose, IconInstagram, IconPlay } from '../components/icons'
 
 // ─── Story Modal ─────────────────────────────────────────────────
 
 function StoryModal({ storiesData, activeIdx, onIdxChange, onClose }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [])
-
-  useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [onClose])
+  const ref = useModal(true, onClose)
 
   return (
-    <div className="story-modal" onClick={onClose}>
+    <div ref={ref} className="story-modal" onClick={onClose} role="dialog" aria-modal="true" aria-label="Stories">
       <button className="story-modal__close" onClick={onClose} aria-label="Fechar">
-        <CloseIcon />
+        <IconClose />
       </button>
       <div className="story-modal__inner" onClick={e => e.stopPropagation()}>
         <TributeStories
@@ -71,7 +37,7 @@ export default function Homenagens() {
   const [storyOpen, setStoryOpen] = useState(false)
   const [storyIdx,  setStoryIdx]  = useState(0)
 
-  const { tributes, loading } = useTributes()
+  const { tributes, loading, error, reload } = useTributes()
 
   const featured = tributes.filter(t => t.featured)
 
@@ -102,28 +68,18 @@ export default function Homenagens() {
         />
       )}
 
-      {/* Page Hero */}
-      <div className="page-hero">
-        <p className="page-hero__breadcrumb">
-          <Link to="/">Início</Link> / Homenagens
-        </p>
-        <h1 className="page-hero__title">Home<br/>nagens</h1>
-        <p className="page-hero__sub">
-          Arte como forma de reconhecimento — retratos e obras dedicadas a celebridades angolanas, do esboço à entrega em mãos.
-        </p>
-        <div className="page-hero__deco">HON</div>
-      </div>
+      <PageHero {...TRIBUTES_PAGE.hero} />
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
-          A carregar…
-        </div>
+        <section className="hom-grid-section"><SkeletonGrid count={6} variant="cards" /></section>
+      ) : error ? (
+        <ErrorState message="Não foi possível carregar as homenagens." onRetry={reload} />
       ) : (
         <>
-          {/* Destaques — circular avatars */}
-          <section className="hom-featured-section">
+          {/* Destaques — avatares circulares abrem os stories */}
+          {featured.length > 0 && <section className="hom-featured-section">
             <div className="hom-featured-header">
-              <div className="section-label">Destaques</div>
+              <div className="section-label">{TRIBUTES_PAGE.featuredLabel}</div>
             </div>
             <div className="hom-featured-grid">
               {featured.map((t, i) => (
@@ -144,15 +100,12 @@ export default function Homenagens() {
                 </button>
               ))}
             </div>
-          </section>
+          </section>}
 
           {/* Full Grid */}
           <section className="hom-grid-section">
             <div className="hom-grid-header">
-              <div className="section-label">Todas as Homenagens</div>
-              <p className="hom-grid-sub">
-                Clique no ícone de story para ver o processo em formato Stories, ou na obra para ver o detalhe completo.
-              </p>
+              <div className="section-label">{TRIBUTES_PAGE.allLabel}</div>
             </div>
 
             <div
@@ -163,17 +116,16 @@ export default function Homenagens() {
                 <div key={t.id} className="hom-card" style={{ '--i': i }}>
                   {/* Thumbnail */}
                   <div className="hom-card__thumb-wrap">
-                    <img src={t.cover} alt={t.celebrity.name} loading="lazy" className="hom-card__thumb" />
+                    <Link to={`/homenagens/${t.slug}`} tabIndex={-1} aria-hidden="true">
+                      <img src={t.cover} alt="" loading="lazy" className="hom-card__thumb" />
+                    </Link>
                     <button
                       className="hom-card__story-btn"
                       onClick={() => openStory(i)}
                       aria-label={`Ver story de ${t.celebrity.name}`}
                     >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="16" height="16">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/>
-                      </svg>
-                      Story
+                      <IconPlay size={14} />
+                      {TRIBUTES_PAGE.storyLabel}
                     </button>
                   </div>
 
@@ -184,7 +136,7 @@ export default function Homenagens() {
                     <p className="hom-card__role">{t.celebrity.role}</p>
                     <p className="hom-card__work">{t.work.title}</p>
                     <Link to={`/homenagens/${t.slug}`} className="hom-card__link">
-                      Ver detalhe <ArrowIcon />
+                      {TRIBUTES_PAGE.detailLabel} <IconArrow size={14} />
                     </Link>
                   </div>
                 </div>
@@ -200,19 +152,11 @@ export default function Homenagens() {
         className={`hom-cta reveal${ctaVisible ? ' visible' : ''}`}
       >
         <div className="hom-cta__inner">
-          <div className="section-label">Acompanhe</div>
-          <h2 className="hom-cta__title">Todo o processo<br /><span>no Instagram</span></h2>
-          <p className="hom-cta__desc">
-            Os bastidores, o processo criativo e os momentos de entrega são partilhados em tempo real. Siga para não perder nenhuma homenagem.
-          </p>
-          <a
-            href="https://instagram.com/lourenco.tomas.art"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary"
-          >
-            <IgIcon />
-            @lourenco.tomas.art
+          <div className="section-label">{TRIBUTES_PAGE.cta.label}</div>
+          <h2 className="hom-cta__title">{TRIBUTES_PAGE.cta.title}<br /><span>{TRIBUTES_PAGE.cta.titleAccent}</span></h2>
+          <p className="hom-cta__desc">{TRIBUTES_PAGE.cta.description}</p>
+          <a href={TRIBUTES_PAGE.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <IconInstagram size={18} /> {TRIBUTES_PAGE.cta.button}
           </a>
         </div>
       </section>

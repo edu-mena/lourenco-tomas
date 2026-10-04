@@ -1,65 +1,106 @@
 import { mediaUrl } from './media'
+import { INSTAGRAM_URL, INSTAGRAM_HANDLE } from './content'
+
+/*
+ * Textos da interface pública.
+ * Registo: "você" (o seu, a sua) em todo o site.
+ * Títulos com \n quebram linha de propósito — nunca a meio de uma palavra.
+ */
 
 export const NAV_LINKS = [
   { label: 'Obras', to: '/obras' },
   { label: 'Corporativo', to: '/corporativos' },
   { label: 'Homenagens', to: '/homenagens' },
   { label: 'Blog', to: '/blog' },
-  { label: 'Sobre o Artista', to: '/sobre' },
+  { label: 'Sobre', to: '/sobre' },
   { label: 'Contacto', to: '/contacto' },
 ]
 
+export const NAV_BRAND = {
+  logo: 'LOURENÇO TOMÁS',
+  cta: { label: 'Encomendar', to: '/encomendas' },
+  mobileAriaLabel: 'Abrir menu',
+}
+
+/* Categoria da galeria → valor do serviço no formulário de encomenda */
+export const CATEGORY_TO_SERVICE = {
+  tshirts: 'tshirt',
+  telas: 'tela',
+  murais: 'mural',
+  calcados: 'calcado',
+}
+
+export const SERVICE_OPTIONS = [
+  { value: '', label: 'Escolha um tipo de obra' },
+  { value: 'tshirt', label: 'Pintura em t-shirt' },
+  { value: 'tela', label: 'Pintura em tela' },
+  { value: 'mural', label: 'Mural' },
+  { value: 'calcado', label: 'Customização de calçado' },
+  { value: 'outro', label: 'Outro / personalizado' },
+]
+
 export const HERO_CONTENT = {
+  eyebrow: 'Aerografia · Luanda, Angola',
   title: ['Lourenço', 'Tomás'],
-  subtitle: 'Transformando superfícies em emoções através da aerografia.',
-  ctaPrimary: 'Explorar Obras',
+  subtitle: 'T-shirts, telas, murais e calçado pintados à mão com aerógrafo. Cada peça é feita uma única vez.',
+  ctaPrimary: 'Ver obras',
   ctaSecondary: 'Encomendar',
-  scrollLabel: 'Scroll',
+  scrollLabel: 'Continuar',
 }
 
 export const ABOUT_SECTION = {
-  label: 'Sobre o Artista',
-  heading: 'Sobre o Artista',
+  label: 'O artista',
+  heading: 'Da oficina do pai ao aerógrafo',
   body: [
-    'Especialista em aerografia, diversas técnicas de estamparia em roupas, customização de calçados e acessórios. Com mais de 30 anos de experiência, transforma a peça de roupa numa verdadeira obra de arte.',
+    'Lourenço cresceu na oficina de pintura automóvel do pai, em Luanda. Hoje pinta com aerógrafo sobre t-shirts, telas, paredes e sapatilhas — sempre à mão, peça a peça.',
   ],
   image: mediaUrl('/images/about/santuario1.jpeg'),
-  imageAlt: 'Arte — Lourenço Tomas',
+  imageAlt: 'Obra de Lourenço Tomás em aerografia',
+  moreLabel: 'Ler a história completa',
   cards: [
-    { key: 'tshirts',  label: 'T-Shirts', desc: 'Aerografia sobre tecido — cada peça única e irrepetível.', img: mediaUrl('/images/about/arte1.jpeg') },
-    { key: 'murais',   label: 'Murais',   desc: 'Pinturas que transformam espaços e comunidades urbanas.', img: mediaUrl('/images/about/arte2.png') },
-    { key: 'telas',    label: 'Telas',    desc: 'Retratos e composições com técnica e sensibilidade únicas.', img: mediaUrl('/images/about/arte3.png') },
-    { key: 'calcados', label: 'Calçados', desc: 'Customização exclusiva com a identidade do cliente.', img: mediaUrl('/images/about/arte4.jpeg') },
+    { key: 'tshirts',  label: 'T-Shirts', desc: 'Retratos e ilustrações pintados directamente no tecido.', img: mediaUrl('/images/about/arte1.jpeg') },
+    { key: 'murais',   label: 'Murais',   desc: 'Paredes interiores e exteriores, de casas a empresas.', img: mediaUrl('/images/about/arte2.png') },
+    { key: 'telas',    label: 'Telas',    desc: 'Retratos e composições, do pequeno ao grande formato.', img: mediaUrl('/images/about/arte3.png') },
+    { key: 'calcados', label: 'Calçados', desc: 'Sapatilhas e calçado de couro personalizados.', img: mediaUrl('/images/about/arte4.jpeg') },
   ],
   ctaLabel: 'Ver obras',
 }
 
-export const MARQUEE_ITEMS = ['T-Shirts','Murais','Telas','Calçados', 'T-Shirts','Murais','Telas','Calçados']
-
 export const GALLERY_SECTION = {
   label: 'Galeria',
   title: 'OBRAS',
-  sub: 'Uma selecção das peças mais icónicas',
-  homLink: { label: 'Homenagens a Celebridades', to: '/homenagens' },
+  sub: 'Selecção recente. Clique numa obra para a ver inteira.',
+  homLink: { label: 'Homenagens a celebridades', to: '/homenagens' },
 }
 
 export const PROCESS_SECTION = {
   label: 'Bastidores',
-  title: 'O PROCESSO\nCRIATIVO',
-  intro: 'Cada obra começa numa ideia, ganha vida através da aerografia e termina como uma peça única de arte.',
+  title: 'O PROCESSO',
+  intro: 'Do esboço ao último detalhe: veja as obras a ganhar forma no ateliê.',
 }
 
 export const TESTIMONIALS_SECTION = {
   label: 'Clientes',
-  title: 'PALAVRAS\nQUE FICAM',
+  title: 'O QUE DIZEM\nOS CLIENTES',
+}
+
+export const CONTACT_SECTION = {
+  heading: 'Encomendas',
+  title: 'TEM UMA IDEIA?\nVAMOS PINTÁ-LA.',
+  body: 'T-shirt, tela, mural ou sapatilhas: descreva o que imagina e receba uma proposta. A conversa continua no WhatsApp.',
+  primary: 'Fazer encomenda',
+  whatsapp: 'Falar no WhatsApp',
 }
 
 export const FOOTER_CONTENT = {
-  quote: 'A arte não reproduz o que é visível — ela torna visível o que nem sempre é.',
+  tagline: 'Aerografia pintada à mão em Luanda, Angola.',
+  waTooltip: 'Falar no WhatsApp',
   links: [
-    { to: '/sobre', label: 'Obras' },
-    { to: '/portfolio', label: 'Portfolio' },
+    { to: '/obras', label: 'Obras' },
     { to: '/encomendas', label: 'Encomendas' },
+    { to: '/homenagens', label: 'Homenagens' },
+    { to: '/blog', label: 'Blog' },
+    { to: '/sobre', label: 'Sobre' },
     { to: '/contacto', label: 'Contacto' },
   ],
 }
@@ -68,95 +109,76 @@ export const BLOG_PAGE = {
   hero: {
     breadcrumb: 'Blog',
     title: 'Blog',
-    subtitle: 'Processo criativo, bastidores e histórias por trás de cada obra.',
-    deco: 'BLG',
+    subtitle: 'Processo criativo, bastidores e as histórias por trás de cada obra.',
   },
   filters: ['Todos', 'Processo', 'Homenagens', 'Técnica', 'Bastidores'],
-  featuredCta: 'Ler artigo →',
+  featuredCta: 'Ler artigo',
   cardReadLabel: 'Ler mais',
-  emptyState: 'Nenhum artigo nesta categoria ainda.',
+  emptyState: 'Ainda não há artigos nesta categoria.',
 }
 
 export const BLOG_POST_PAGE = {
   cta: {
-    label: 'Quer uma obra assim?',
-    title: 'Encomendar uma peça única',
-    description: 'Cada obra é criada de raiz, com dedicação total ao detalhe e à emoção. Entre em contacto e transformemos a sua ideia em arte.',
-    button: 'Encomendar Agora →',
+    label: 'Gostou desta obra?',
+    title: 'Encomende uma peça única',
+    description: 'Cada obra é criada de raiz. Descreva a sua ideia e receba uma proposta.',
+    button: 'Fazer encomenda',
   },
   notFound: {
     message: 'Artigo não encontrado.',
-    backLabel: '← Voltar ao Blog',
+    backLabel: 'Voltar ao blog',
   },
   relatedSectionLabel: 'Continue a ler',
   relatedTitle: 'Outros artigos',
 }
 
-export const CONTACT_SECTION = {
-  heading: 'Contacto',
-  title: 'VAMOS\nCRIAR ALGO\nÚNICO',
-  body: 'Cada encomenda é uma obra exclusiva. Seja uma t-shirt, uma tela, um mural ou um par de sapatilhas — o resultado será sempre único e artístico.',
-  form: {
-    name: { label: 'Nome', placeholder: 'O seu nome' },
-    email: { label: 'Email', placeholder: 'o.seu@email.com' },
-    service: { label: 'Tipo de Encomenda', placeholder: 'Seleccionar serviço', options: [
-      { value: '', label: 'Seleccionar serviço' },
-      { value: 'tshirt', label: 'Pintura em T-Shirt' },
-      { value: 'tela', label: 'Pintura em Tela' },
-      { value: 'mural', label: 'Pintura Mural' },
-      { value: 'calcado', label: 'Customização de Calçado' },
-      { value: 'outro', label: 'Outro / Personalizado' },
-    ]},
-    message: { label: 'Descreva o Projecto', placeholder: 'Conte-me a sua ideia, dimensões, referências...' },
-    submit: { default: 'Enviar Encomenda', sent: 'Enviado! ✓' },
-  },
-}
-
 export const CONTACTO_PAGE = {
   hero: {
     breadcrumb: 'Contacto',
-    title: 'CONTA\nCTO',
-    subtitle: 'Vamos criar algo único juntos — cada conversa começa aqui.',
-    deco: 'OLÁ',
+    title: 'Contacto',
+    subtitle: 'A resposta mais rápida é pelo WhatsApp. Para murais e projectos grandes, o email permite enviar referências.',
   },
   channels: {
-    heading: 'Canais de Contacto',
-    title: 'FALA\nCONNOSCO',
-    body: 'A forma mais rápida de obter resposta é pelo WhatsApp. Para projectos maiores como murais e telas, o email permite partilhar mais detalhes e referências.',
+    heading: 'Canais',
+    title: 'FALE\nCONNOSCO',
+    body: 'Escolha o canal que preferir. Toque no ícone de copiar para guardar o número ou o email.',
   },
   form: {
-    intro: 'Mensagem Directa',
+    intro: 'Mensagem directa',
     titles: 'ENVIAR\nMENSAGEM',
     fields: {
       name: { label: 'Nome', placeholder: 'O seu nome' },
       email: { label: 'Email', placeholder: 'o.seu@email.com' },
       subject: { label: 'Assunto', options: [
-        { value: '', label: 'Seleccionar assunto' },
-        { value: 'encomenda', label: 'Fazer uma encomenda' },
-        { value: 'orcamento', label: 'Pedir orçamento' },
-        { value: 'colaboracao', label: 'Proposta de colaboração' },
-        { value: 'press', label: 'Imprensa / Media' },
-        { value: 'outro', label: 'Outro' },
+        { value: '', label: 'Escolha um assunto' },
+        { value: 'Encomenda', label: 'Fazer uma encomenda' },
+        { value: 'Orçamento', label: 'Pedir orçamento' },
+        { value: 'Colaboração', label: 'Proposta de colaboração' },
+        { value: 'Imprensa', label: 'Imprensa / media' },
+        { value: 'Outro', label: 'Outro' },
       ] },
-      message: { label: 'Mensagem', placeholder: 'Escreva a sua mensagem aqui...' },
+      message: { label: 'Mensagem', placeholder: 'Escreva a sua mensagem…' },
     },
-    submit: { default: 'Enviar Mensagem', sent: 'Enviado! ✓' },
-    whatsapp: 'WhatsApp',
+    submitWhatsApp: 'Enviar pelo WhatsApp',
+    submitEmail: 'Enviar por email',
+    sent: {
+      title: 'Mensagem pronta',
+      body: 'Abrimos a conversa com a sua mensagem já escrita — só falta carregar em enviar. Se nada abriu, use os botões abaixo.',
+    },
   },
   infoCards: [
-    { iconKey: 'pin',   label: 'Localização',        value: 'Luanda, Angola' },
-    { iconKey: 'clock', label: 'Tempo de resposta',   value: '24–48 horas úteis' },
-    { iconKey: 'globe', label: 'Envios',              value: 'Internacionais disponíveis' },
-    { iconKey: 'brush', label: 'Projectos',           value: 'Murais, telas, encomendas' },
+    { iconKey: 'pin',   label: 'Localização',      value: 'Luanda, Angola' },
+    { iconKey: 'clock', label: 'Tempo de resposta', value: '24–48 horas úteis' },
+    { iconKey: 'globe', label: 'Envios',            value: 'Internacionais disponíveis' },
+    { iconKey: 'brush', label: 'Projectos',         value: 'Murais, telas, encomendas' },
   ],
 }
 
 export const CORPORATE_PAGE = {
   hero: {
-    breadcrumb: 'Corporativos',
-    title: 'Corpo\nrativos',
-    subtitle: 'Arte criada para empresas angolanas — murais, retratos e instalações que transformam espaços de trabalho em experiências memoráveis.',
-    deco: 'EMP',
+    breadcrumb: 'Corporativo',
+    title: 'Corporativo',
+    subtitle: 'Arte criada para empresas angolanas — murais, retratos e instalações que transformam espaços de trabalho.',
   },
   stats: [
     { num: null, label: 'Empresas parceiras' },
@@ -170,15 +192,15 @@ export const CORPORATE_PAGE = {
   ],
   filters: ['Todos', 'Mural', 'Retrato', 'Tela', 'Impressão', 'Instalação'],
   services: [
-    { icon: '🖼', title: 'Murais', desc: 'Arte de grande formato para lobbies, corredores e espaços de trabalho — do conceito ao acabamento final.', detail: 'A partir de 2 m²' },
-    { icon: '🎨', title: 'Telas & Impressões', desc: 'Obras únicas ou séries para salas de reunião, recepções e escritórios de direcção.', detail: 'Formatos personalizados' },
-    { icon: '👤', title: 'Retratos Corporativos', desc: 'Retratos de líderes, fundadores e equipas — perpetuando a identidade e a memória da empresa.', detail: 'Óleo, carvão ou digital' },
-    { icon: '✦', title: 'Instalações', desc: 'Projectos artísticos integrados na arquitectura do espaço, criados em co-autoria com o cliente.', detail: 'Projecto à medida' },
+    { title: 'Murais', desc: 'Arte de grande formato para lobbies, corredores e espaços de trabalho — do conceito ao acabamento final.', detail: 'A partir de 2 m²' },
+    { title: 'Telas & impressões', desc: 'Obras únicas ou séries para salas de reunião, recepções e gabinetes de direcção.', detail: 'Formatos personalizados' },
+    { title: 'Retratos corporativos', desc: 'Retratos de líderes, fundadores e equipas, para a memória e identidade da empresa.', detail: 'Óleo, carvão ou digital' },
+    { title: 'Instalações', desc: 'Projectos artísticos integrados na arquitectura do espaço, criados em conjunto com o cliente.', detail: 'Projecto à medida' },
   ],
   process: [
-    { num: '01', title: 'Briefing', desc: 'Reunião para entender a identidade da empresa, espaço e objectivo da obra.' },
-    { num: '02', title: 'Conceito', desc: 'Apresentação de propostas visuais, paleta de cores e referências estéticas.' },
-    { num: '03', title: 'Execução', desc: 'Produção da obra com acompanhamento fotográfico e updates regulares.' },
+    { num: '01', title: 'Briefing', desc: 'Reunião para perceber a identidade da empresa, o espaço e o objectivo da obra.' },
+    { num: '02', title: 'Conceito', desc: 'Apresentação de propostas visuais, paleta de cores e referências.' },
+    { num: '03', title: 'Execução', desc: 'Produção da obra com registo fotográfico e actualizações regulares.' },
     { num: '04', title: 'Entrega', desc: 'Instalação no local, documentação final e certificado de autenticidade.' },
   ],
   processTitle: { first: 'Do briefing', second: 'à entrega' },
@@ -187,11 +209,12 @@ export const CORPORATE_PAGE = {
     services: 'O que oferecemos',
     cta: 'Próximo projecto',
   },
-  emptyState: 'Nenhuma obra nesta categoria ainda.',
+  emptyState: 'Ainda não há obras nesta categoria.',
+  companyFilterLabel: 'Empresa',
   cta: {
     title: ['A sua empresa', 'merece arte'],
-    description: 'Cada espaço conta uma história. Fale connosco e descubra como a arte pode transformar o ambiente da sua empresa.',
-    primaryBtn: 'Solicitar orçamento',
+    description: 'Fale connosco e descubra como uma obra pode transformar o ambiente da sua empresa.',
+    primaryBtn: 'Pedir orçamento',
     waBtn: 'WhatsApp',
   },
 }
@@ -199,125 +222,122 @@ export const CORPORATE_PAGE = {
 export const ORDER_PAGE = {
   hero: {
     breadcrumb: 'Encomendas',
-    title: 'ENCOMEN\nDAS',
-    subtitle: 'Obra exclusiva, criada de raiz para ti — da ideia inicial à entrega final.',
-    deco: 'ART',
+    title: 'Encomendas',
+    subtitle: 'Uma obra criada de raiz para si — da ideia à entrega.',
   },
   sectionLabels: {
     services: 'O que criamos',
     process: 'Processo',
-    form: 'Fazer uma Encomenda',
-    faq: 'Dúvidas',
+    form: 'Pedido',
+    faq: 'Antes de encomendar',
   },
   sectionTitles: {
     services: 'SERVIÇOS',
     process: 'COMO FUNCIONA',
-    form: 'FORMULÁRIO',
-    faq: 'FAQ',
+    form: 'O SEU PEDIDO',
   },
+  serviceCta: 'Encomendar',
   form: {
     fields: {
-      name: { label: 'Nome completo', placeholder: 'O seu nome' },
+      name: { label: 'Nome', placeholder: 'O seu nome' },
       email: { label: 'Email', placeholder: 'o.seu@email.com' },
-      phone: { label: 'WhatsApp / Telefone', placeholder: '+244 9XX XXX XXX' },
-      service: {
-        label: 'Tipo de Encomenda',
-        options: [
-          { value: '', label: 'Seleccionar serviço' },
-          { value: 'tshirt', label: 'Pintura em T-Shirt' },
-          { value: 'tela', label: 'Pintura em Tela' },
-          { value: 'mural', label: 'Pintura Mural' },
-          { value: 'calcado', label: 'Customização de Calçado' },
-          { value: 'outro', label: 'Outro / Personalizado' },
-        ],
+      phone: { label: 'Telefone', placeholder: '+244 9XX XXX XXX' },
+      service: { label: 'Tipo de obra' },
+      size: { label: 'Dimensões / tamanho', placeholder: 'Ex.: tela 60×80 cm, t-shirt M' },
+      deadline: { label: 'Prazo', placeholder: 'Ex.: 3 semanas, sem pressa' },
+      desc: {
+        label: 'A sua ideia',
+        placeholder: 'Tema, cores, referências, onde vai ser usada…',
+        hint: 'Quanto mais detalhe, mais rigorosa a proposta.',
       },
-      size: { label: 'Dimensões / Tamanho', placeholder: 'Ex: Tela 60×80cm, Camisola M' },
-      deadline: { label: 'Prazo desejado', placeholder: 'Ex: 3 semanas, sem urgência' },
-      desc: { label: 'Descreva o seu projecto', placeholder: 'Descreva a sua ideia em detalhe — tema, cores preferidas, referências visuais, uso previsto...' },
     },
-    submit: { default: 'Enviar Encomenda', sent: 'Enviado! ✓' },
+    reference: ref => `Referência: obra «${ref}» da galeria.`,
+    submit: 'Enviar pedido pelo WhatsApp',
+    note: 'O pedido abre no WhatsApp já preenchido. Não há compromisso até aprovar a proposta.',
+    sent: {
+      title: 'Pedido pronto a enviar',
+      body: 'Abrimos o WhatsApp com o seu pedido já escrito — só falta carregar em enviar. Se nada abriu, use os botões abaixo.',
+    },
   },
   services: [
-    { icon: '◈', title: 'T-Shirts', desc: 'Pinturas realistas feitas com técnica da aerografia e detalhes impressionantes. Retratos, paisagens ou arte abstracta em tecido. Cada peça é feita com amor e muita atenção aos detalhes.', price: 'A partir de 150.000 AOA', includes: ['Escolha do design', 'Provas de cor', 'Fixação profissional', 'Cuidados de manutenção'] },
-    { icon: '◉', title: 'Telas', desc: 'Obras em tela de algodão ou linho, em diferentes formatos. Da miniatura ao grande formato, cada tela é uma declaração artística.', price: 'A partir de 30.000 AOA', includes: ['Tela profissional incluída', 'Verniz de protecção', 'Certificado de autenticidade', 'Moldura opcional'] },
-    { icon: '◫', title: 'Murais', desc: 'Intervenções murais para espaços interiores e exteriores. Do pequeno destaque visual ao grande mural de impacto urbano.', price: 'Orçamento personalizado', includes: ['Visita ao espaço', 'Projecto digital', 'Execução completa', 'Protecção anti-UV'] },
-    { icon: '◬', title: 'Calçado', desc: 'Customização exclusiva de sapatilhas e calçado de couro. Cada par torna-se numa peça de arte portável e intransferível.', price: 'A partir de 20.000 AOA', includes: ['Limpeza e preparação', 'Arte customizada', 'Selante protector', 'Caixa de apresentação'] },
+    { key: 'tshirts', value: 'tshirt', title: 'T-Shirts', img: mediaUrl('/images/about/arte1.jpeg'), desc: 'Pinturas realistas em aerografia directamente no tecido: retratos, paisagens ou arte abstracta.', price: 'A partir de 150.000 AOA', includes: ['Escolha do design', 'Provas de cor', 'Fixação profissional', 'Cuidados de manutenção'] },
+    { key: 'telas', value: 'tela', title: 'Telas', img: mediaUrl('/images/about/arte3.png'), desc: 'Obras em tela de algodão ou linho, da miniatura ao grande formato.', price: 'A partir de 30.000 AOA', includes: ['Tela profissional incluída', 'Verniz de protecção', 'Certificado de autenticidade', 'Moldura opcional'] },
+    { key: 'murais', value: 'mural', title: 'Murais', img: mediaUrl('/images/about/arte2.png'), desc: 'Murais para espaços interiores e exteriores, do pequeno destaque ao grande formato.', price: 'Orçamento personalizado', includes: ['Visita ao espaço', 'Projecto digital', 'Execução completa', 'Protecção anti-UV'] },
+    { key: 'calcados', value: 'calcado', title: 'Calçado', img: mediaUrl('/images/about/arte4.jpeg'), desc: 'Customização de sapatilhas e calçado de couro — cada par é exclusivo.', price: 'A partir de 20.000 AOA', includes: ['Limpeza e preparação', 'Arte personalizada', 'Selante protector', 'Caixa de apresentação'] },
   ],
   steps: [
-    { num: '01', title: 'Contacto', desc: 'Envia-nos a tua ideia por WhatsApp, email ou pelo formulário abaixo. Quanto mais detalhe, melhor.' },
-    { num: '02', title: 'Conceito', desc: 'Desenvolvemos juntos o conceito visual. Partilhamos esboços digitais para aprovação antes de começar.' },
-    { num: '03', title: 'Criação', desc: 'A obra ganha vida no ateliê. Partilhamos actualizações do processo ao longo da criação.' },
-    { num: '04', title: 'Entrega', desc: 'A obra é embalada com cuidado e entregue pessoalmente ou enviada para qualquer parte do mundo.' },
+    { num: '01', title: 'Contacto', desc: 'Envie a sua ideia pelo formulário, WhatsApp ou email. Quanto mais detalhe, melhor.' },
+    { num: '02', title: 'Conceito', desc: 'Desenvolvemos o conceito em conjunto e partilhamos esboços digitais para aprovação.' },
+    { num: '03', title: 'Criação', desc: 'A obra ganha vida no ateliê, com actualizações do processo ao longo da criação.' },
+    { num: '04', title: 'Entrega', desc: 'A obra é embalada com cuidado e entregue em mãos ou enviada para qualquer país.' },
   ],
   faqs: [
-    { q: 'Qual é o tempo de entrega?', a: 'T-shirts e calçado: 7 a 14 dias úteis. Telas: 14 a 21 dias. Murais: acordado no orçamento inicial. Encomendas urgentes têm suplemento.' },
-    { q: 'Como funciona o pagamento?', a: 'Pedimos 50% de sinal no momento da confirmação e os restantes 50% na entrega. Aceitamos transferência bancária, multicaixa e dinheiro.' },
-    { q: 'Posso acompanhar a criação?', a: 'Sim! Partilhamos actualizações regulares por WhatsApp ou Instagram durante todo o processo criativo.' },
-    { q: 'Fazem envios internacionais?', a: 'Sim, enviamos telas e calçado para qualquer país. Os custos de envio são calculados no momento da encomenda.' },
-    { q: 'Quantas revisões estão incluídas?', a: 'Incluímos até 2 revisões no conceito digital antes de iniciar a obra. Revisões adicionais têm custo acrescido.' },
+    { q: 'Qual é o tempo de entrega?', a: 'T-shirts e calçado: 7 a 14 dias úteis. Telas: 14 a 21 dias. Murais: acordado no orçamento. Encomendas urgentes têm suplemento.' },
+    { q: 'Como funciona o pagamento?', a: '50% de sinal na confirmação e 50% na entrega. Aceitamos transferência bancária, Multicaixa e numerário.' },
+    { q: 'Posso acompanhar a criação?', a: 'Sim. Partilhamos actualizações regulares por WhatsApp ou Instagram durante todo o processo.' },
+    { q: 'Fazem envios internacionais?', a: 'Sim, enviamos telas e calçado para qualquer país. Os portes são calculados no momento da encomenda.' },
+    { q: 'Quantas revisões estão incluídas?', a: 'Até 2 revisões do conceito digital antes de começar a obra. Revisões adicionais têm custo.' },
   ],
 }
 
 export const ABOUT_PAGE = {
   hero: {
     breadcrumb: 'Sobre',
-    title: 'LOURENÇO\nTOMAS',
-    subtitle: 'Artista angolano · Aerografia & Arte · Luanda, Angola',
-    deco: 'ARTE',
+    title: 'Lourenço Tomás',
+    subtitle: 'Artista angolano · Aerografia · Luanda',
   },
   bioImage: mediaUrl('/images/about/about.jpeg'),
-  bioImageAlt: 'Lourenço Tomas — Artista Plástico',
-  badge: { num: '30+', text: 'Anos de Arte' },
+  bioImageAlt: 'Lourenço Tomás',
+  badge: { num: '30+', text: 'Anos de arte' },
   paragraphs: [
-    'Lourenço Joaquim Tomás nasceu em Luanda, Angola, a 18 de novembro de 1982. Filho de Amável Tomás e Mariana Joaquim António, ambos naturais da Gabela, província do Kwanza Sul, cresceu numa família numerosa, sendo o sétimo de dez filhos.',
-    'Os seus pais mudaram-se para Luanda em busca de melhores condições de vida, enfrentando inúmeras dificuldades. Após vários desafios, incluindo a perda da casa onde viviam e anos de grande sacrifício, o pai estabeleceu uma oficina de bate-chapa e pintura automóvel, onde quase todos os filhos aprenderam a profissão.',
-    'Desde cedo, Lourenço demonstrou uma forte paixão pelo desenho. Apesar da preocupação do pai, que via a arte como um passatempo sem futuro, ele manteve-se firme no seu sonho de se tornar artista. Em 2003 ingressou na Escola Nacional de Artes Plásticas (ENAP), onde foi reconhecido pelo seu talento em desenho. Contudo, enfrentou reprovações e dificuldades académicas que o levaram a abandonar a formação artística formal.',
-    'Determinado a seguir o seu caminho, passou a desenvolver os seus conhecimentos de forma autodidata. Em 2007 dedicou-se ao design gráfico, área em que trabalhou durante dez anos, colaborando com diversas empresas e garantindo o seu sustento.',
-    'Em 2017 regressou às artes plásticas com foco na aerografia, técnica que sempre desejou dominar. Com muita dedicação, estudo independente e prática constante, rapidamente alcançou resultados que impressionaram o público e os seus seguidores.',
-    'Em novembro de 2018 realizou a sua primeira grande exposição individual de pintura em aerografia, intitulada “Seguindo o Sonho”. Hoje, a arte é a sua profissão e a principal fonte de sustento da sua família, tornando-se a prova de que a perseverança, a paixão e a fé podem transformar um sonho em realidade.',
+    'Lourenço Joaquim Tomás nasceu em Luanda, Angola, a 18 de Novembro de 1982. Filho de Amável Tomás e Mariana Joaquim António, ambos naturais da Gabela, província do Kwanza Sul, cresceu numa família numerosa, sendo o sétimo de dez filhos.',
+    'Os pais mudaram-se para Luanda em busca de melhores condições de vida, enfrentando inúmeras dificuldades. Após vários desafios, incluindo a perda da casa onde viviam e anos de grande sacrifício, o pai estabeleceu uma oficina de bate-chapa e pintura automóvel, onde quase todos os filhos aprenderam a profissão.',
+    'Desde cedo, Lourenço demonstrou uma forte paixão pelo desenho. Apesar da preocupação do pai, que via a arte como um passatempo sem futuro, manteve-se firme no sonho de ser artista. Em 2003 entrou na Escola Nacional de Artes Plásticas (ENAP), onde foi reconhecido pelo talento no desenho. Contudo, reprovações e dificuldades académicas levaram-no a abandonar a formação artística formal.',
+    'Determinado a seguir o seu caminho, continuou a aprender de forma autodidata. Em 2007 dedicou-se ao design gráfico, área em que trabalhou durante dez anos, colaborando com diversas empresas.',
+    'Em 2017 regressou às artes plásticas com foco na aerografia, técnica que sempre quis dominar. Com estudo independente e prática constante, rapidamente alcançou resultados que impressionaram o público.',
+    'Em Novembro de 2018 realizou a primeira grande exposição individual de aerografia, «Seguindo o Sonho». Hoje, a arte é a sua profissão e o sustento da família — a prova de que a perseverança, a paixão e a fé podem transformar um sonho em realidade.',
   ],
   stats: [
-    { num: '30+', label: 'Anos de Arte' },
-    { num: '1000+', label: 'Peças Criadas' },
-    { num: '1000+', label: 'Clientes Satisfeitos' },
+    { num: '30+', label: 'Anos de arte' },
+    { num: '1000+', label: 'Peças criadas' },
+    { num: '1000+', label: 'Clientes' },
   ],
   sectionLabels: {
     bio: 'Biografia',
-    values: 'Filosofia',
+    values: 'O que faz',
     timeline: 'Percurso',
     cta: 'Colaboração',
   },
+  sectionTitles: {
+    heading: 'Sobre o artista',
+    values: 'ESPECIALIDADES',
+    timeline: 'PERCURSO',
+  },
   pillars: [
-    { icon: '◈', title: 'T-Shirts', desc: 'Peças personalizadas através de técnicas de aerografia e estamparia artística, transformando cada t-shirt numa expressão única de identidade e criatividade.' },
-    { icon: '◈', title: 'Murais', desc: 'Intervenções artísticas em espaços públicos e privados, criando composições visuais que valorizam ambientes e comunicam ideias de forma impactante.' },
-    { icon: '◈', title: 'Telas', desc: 'Obras produzidas sobre tela que combinam técnica, imaginação e experiência, resultando em peças originais destinadas à decoração e colecionismo.' },
-    { icon: '◈', title: 'Calçados', desc: 'Customização exclusiva de sapatilhas e calçados, onde cada detalhe é cuidadosamente trabalhado para criar peças verdadeiramente diferenciadas.' },
+    { title: 'T-Shirts', desc: 'Peças personalizadas com aerografia e estamparia artística — cada t-shirt é uma expressão de identidade.' },
+    { title: 'Murais', desc: 'Intervenções em espaços públicos e privados que valorizam ambientes e comunicam ideias.' },
+    { title: 'Telas', desc: 'Obras sobre tela que juntam técnica, imaginação e experiência, para decoração e colecção.' },
+    { title: 'Calçados', desc: 'Customização de sapatilhas e calçado, com cada detalhe trabalhado à mão.' },
   ],
   cta: {
     label: 'Colaboração',
     title: 'Vamos criar juntos',
-    description: 'Uma obra feita à tua medida, com a alma do artista em cada traço.',
+    description: 'Uma obra feita à sua medida, com a mão do artista em cada traço.',
     primary: { label: 'Encomendar', to: '/encomendas' },
-    secondary: { label: 'Ver Portfolio', to: '/portfolio' },
+    secondary: { label: 'Ver obras', to: '/obras' },
   },
 }
 
 export const WORKS_PAGE = {
   hero: {
     breadcrumb: 'Obras',
-    title: 'OBRAS',
-    subtitle: 'Aerografia sobre t-shirts, telas, murais e calçado — cada peça é única e irrepetível.',
-    deco: 'OBRAS',
+    title: 'Obras',
+    subtitle: 'Aerografia sobre t-shirts, telas, murais e calçado — cada peça é feita uma única vez.',
   },
-  stats: [
-    { num: '12', label: 'Obras em Exposição' },
-    { num: '4', label: 'Categorias' },
-    { num: '10+', label: 'Anos de Arte' },
-  ],
   cta: {
-    label: 'Cria a tua obra exclusiva',
-    description: 'Cada peça é pensada, sentida e criada de raiz para o cliente.',
-    button: 'Encomendar Agora',
+    label: 'Não encontrou o que procura?',
+    description: 'Cada peça é criada de raiz. Descreva a sua ideia e receba uma proposta.',
+    button: 'Fazer encomenda',
   },
   countLabel: 'peça',
   countLabelPlural: 'peças',
@@ -326,40 +346,35 @@ export const WORKS_PAGE = {
 export const TRIBUTES_PAGE = {
   hero: {
     breadcrumb: 'Homenagens',
-    title: 'Home\nnagens',
-    subtitle: 'Arte como forma de reconhecimento — retratos e obras dedicadas a celebridades angolanas, do esboço à entrega em mãos.',
-    deco: 'HON',
+    title: 'Homenagens',
+    subtitle: 'Retratos e obras dedicadas a celebridades angolanas — do esboço à entrega em mãos.',
   },
   featuredLabel: 'Destaques',
-  featuredSubtitle: 'Clique no ícone de story para ver o processo em formato Stories, ou na obra para ver o detalhe completo.',
-  allLabel: 'Todas as Homenagens',
+  allLabel: 'Todas as homenagens',
+  storyLabel: 'Ver story',
+  detailLabel: 'Ver detalhe',
   cta: {
     label: 'Acompanhe',
-    title: 'Todo o processo\nno Instagram',
-    description: 'Os bastidores, o processo criativo e os momentos de entrega são partilhados em tempo real. Siga para não perder nenhuma homenagem.',
-    button: '@lourenco.tomas.art',
+    title: 'Todo o processo',
+    titleAccent: 'no Instagram',
+    description: 'Bastidores, processo criativo e entregas, partilhados em tempo real.',
+    button: INSTAGRAM_HANDLE,
   },
-  instagramUrl: 'https://instagram.com/lourenco.tomas.art',
-}
-
-export const NAV_BRAND = {
-  logo: 'LOURENÇO TOMÁS',
-  cta: { label: 'Encomendar', to: '/encomendas' },
-  mobileAriaLabel: 'Abrir menu',
+  instagramUrl: INSTAGRAM_URL,
 }
 
 export const TRIBUTE_DETAIL_PAGE = {
   notFound: {
     message: 'Homenagem não encontrada.',
-    backLabel: '← Voltar às Homenagens',
+    backLabel: 'Voltar às homenagens',
   },
-  heroBackLabel: '← Homenagens',
-  heroInstagramLabel: 'Instagram do artista ↗',
-  sectionLabel: 'A Obra',
+  heroBackLabel: 'Homenagens',
+  heroInstagramLabel: 'Instagram do artista',
+  sectionLabel: 'A obra',
   cta: {
     label: 'Acompanhe',
     title: 'Veja o processo\nno Instagram',
-    description: 'Os bastidores, o processo criativo e os momentos de entrega são partilhados em tempo real.',
+    description: 'Bastidores, processo criativo e entregas, partilhados em tempo real.',
   },
   placeholder: {
     title: 'Mais vídeos a caminho',

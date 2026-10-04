@@ -1,6 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useTributeBySlug } from '../hooks/useApi'
+import { useModal, useSwipe } from '../hooks/useModal'
+import { TRIBUTE_DETAIL_PAGE } from '../data/ui'
+import { IconClose } from '../components/icons'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -84,7 +87,7 @@ function VideoCard({ video }) {
   }
 
   return (
-    <div className="hdet-video-card" onClick={() => setPlaying(true)} style={{ cursor: 'pointer' }}>
+    <button type="button" className="hdet-video-card" onClick={() => setPlaying(true)} aria-label={`Ver vídeo: ${video.title}`}>
       <div className={`hdet-video-card__thumb${video.type === 'video' ? ' hdet-video-card__thumb--video' : ''}`}>
         {video.thumb ? (
           <img src={video.thumb} alt={video.title} loading="lazy" />
@@ -97,18 +100,26 @@ function VideoCard({ video }) {
       <div className="hdet-video-card__info">
         <p className="hdet-video-card__title">{video.title}</p>
       </div>
-    </div>
+    </button>
   )
 }
 
 // ─── Lightbox ────────────────────────────────────────────────────
 
 function Lightbox({ images, activeIdx, onClose, onNav }) {
+  const ref = useModal(true, onClose, e => {
+    if (e.key === 'ArrowLeft') onNav(-1)
+    if (e.key === 'ArrowRight') onNav(1)
+  })
+  const swipe = useSwipe(() => onNav(1), () => onNav(-1))
   return (
-    <div className="hdet-lightbox" onClick={onClose}>
-      <button className="hdet-lightbox__close" onClick={onClose}>✕</button>
+    <div ref={ref} className="hdet-lightbox" onClick={onClose} role="dialog" aria-modal="true"
+      aria-label={images[activeIdx].caption || 'Imagem'} {...swipe}>
+      <button className="hdet-lightbox__close" onClick={onClose} aria-label="Fechar"><IconClose /></button>
+      <span className="hdet-lightbox__counter">{activeIdx + 1} / {images.length}</span>
       <button
         className="hdet-lightbox__nav hdet-lightbox__nav--l"
+        aria-label="Imagem anterior"
         onClick={e => { e.stopPropagation(); onNav(-1) }}
       >
         <ArrowIcon dir="left" />
@@ -119,6 +130,7 @@ function Lightbox({ images, activeIdx, onClose, onNav }) {
       </div>
       <button
         className="hdet-lightbox__nav hdet-lightbox__nav--r"
+        aria-label="Imagem seguinte"
         onClick={e => { e.stopPropagation(); onNav(1) }}
       >
         <ArrowIcon />
@@ -136,8 +148,10 @@ export default function HomenagensDetalhe() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '120px 0', color: 'rgba(245,245,245,0.35)' }}>
-        A carregar…
+      <div className="bpost-loading" aria-busy="true" aria-label="A carregar">
+        <div className="skeleton bpost-loading__hero" />
+        <div className="skeleton bpost-loading__line" />
+        <div className="skeleton bpost-loading__line bpost-loading__line--short" />
       </div>
     )
   }
@@ -145,9 +159,9 @@ export default function HomenagensDetalhe() {
   if (error || !tribute) {
     return (
       <div className="blog-404">
-        <p>Homenagem não encontrada.</p>
-        <Link to="/homenagens" className="btn-outline" style={{ marginTop: 24 }}>
-          ← Voltar às Homenagens
+        <p>{TRIBUTE_DETAIL_PAGE.notFound.message}</p>
+        <Link to="/homenagens" className="btn-outline">
+          {TRIBUTE_DETAIL_PAGE.notFound.backLabel}
         </Link>
       </div>
     )
@@ -180,7 +194,7 @@ export default function HomenagensDetalhe() {
         <img src={tribute.cover} alt={tribute.celebrity.name} className="hdet-hero__img" />
         <div className="hdet-hero__grad" />
         <div className="hdet-hero__back">
-          <Link to="/homenagens" className="bpost-back-link">← Homenagens</Link>
+          <Link to="/homenagens" className="bpost-back-link"><ArrowIcon dir="left" /> {TRIBUTE_DETAIL_PAGE.heroBackLabel}</Link>
         </div>
         <div className="hdet-hero__content">
           <span className="hdet-hero__cat">{tribute.work.category}</span>
@@ -195,7 +209,7 @@ export default function HomenagensDetalhe() {
         {/* Intro */}
         <section className="hdet-intro">
           <div className="hdet-intro__lead">
-            <div className="section-label">A Obra</div>
+            <div className="section-label">{TRIBUTE_DETAIL_PAGE.sectionLabel}</div>
             <h2 className="hdet-intro__title">{tribute.work.title}</h2>
           </div>
           <div className="hdet-intro__body">
@@ -245,18 +259,6 @@ export default function HomenagensDetalhe() {
             <div className="section-label">Vídeos</div>
             <div className="hdet-videos__grid">
               {videos.map(v => <VideoCard key={v.id} video={v} />)}
-              {/* Placeholder slot */}
-              <div className="hdet-video-card hdet-video-card--placeholder">
-                <div className="hdet-video-card__thumb hdet-video-card__thumb--empty">
-                  <PlayIcon />
-                  <span>Em breve</span>
-                </div>
-                <div className="hdet-video-card__info">
-                  <p className="hdet-video-card__title" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                    Mais vídeos a caminho
-                  </p>
-                </div>
-              </div>
             </div>
           </section>
         )}
@@ -274,7 +276,7 @@ export default function HomenagensDetalhe() {
                 className="hdet-celeb-bio__ig"
               >
                 <IgIcon />
-                Instagram do artista ↗
+                Instagram de {tribute.celebrity.name}
               </a>
             )}
           </section>
@@ -283,11 +285,9 @@ export default function HomenagensDetalhe() {
         {/* CTA Instagram */}
         <section className="hdet-ig-cta">
           <div className="hdet-ig-cta__inner">
-            <div className="section-label">Acompanhe</div>
+            <div className="section-label">{TRIBUTE_DETAIL_PAGE.cta.label}</div>
             <h2 className="hdet-ig-cta__title">Veja o processo<br /><span>no Instagram</span></h2>
-            <p className="hdet-ig-cta__desc">
-              Os bastidores, o processo criativo e os momentos de entrega são partilhados em tempo real.
-            </p>
+            <p className="hdet-ig-cta__desc">{TRIBUTE_DETAIL_PAGE.cta.description}</p>
             <a
               href={tribute.instagram}
               target="_blank"
@@ -295,7 +295,7 @@ export default function HomenagensDetalhe() {
               className="btn-primary"
             >
               <IgIcon />
-              @lourenco.tomas.art
+              Ver no Instagram
             </a>
           </div>
         </section>

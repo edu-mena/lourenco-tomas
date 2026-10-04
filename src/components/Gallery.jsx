@@ -1,76 +1,52 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { GALLERY_FILTERS } from '../data/content'
-import { GalleryItem, Lightbox } from './ArtCanvas'
 import { GALLERY_SECTION } from '../data/ui'
 import { useGallery } from '../hooks/useApi'
+import GalleryBrowser from './GalleryBrowser'
+import { IconArrow } from './icons'
 
-/* ── Gallery Section ───────────────────────────── */
+const HOME_LIMIT = 6
+
+/* Selecção curta na Home — a galeria completa vive em /obras */
 export default function Gallery() {
   const [filter, setFilter] = useState('all')
-  const [lightboxItem, setLightboxItem] = useState(null)
   const [headerRef, headerVisible] = useScrollReveal()
+  const { items, loading, error, reload } = useGallery()
 
-  const { items, loading } = useGallery()
-
-  const filtered = filter === 'all'
-    ? items
-    : items.filter(i => i.cat === filter)
+  const total = filter === 'all' ? items.length : items.filter(i => i.cat === filter).length
+  const moreHref = filter === 'all' ? '/obras' : `/obras?filter=${filter}`
 
   return (
-    <>
-      <section id="gallery" className="gallery-section" aria-label="Galeria de Obras">
-        <div
-          ref={headerRef}
-          className={`gallery-section__header reveal${headerVisible ? ' visible' : ''}`}
-        >
-          <div className="gallery-section__meta">
-            <div className="section-label">{GALLERY_SECTION.label}</div>
-            <h2 className="section-title-display">{GALLERY_SECTION.title}</h2>
-            <p className="gallery-section__sub">{GALLERY_SECTION.sub}</p>
-          </div>
-          <Link to={GALLERY_SECTION.homLink.to} className="gallery-hom-link">
-            <span>{GALLERY_SECTION.homLink.label}</span>
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    <section id="gallery" className="gallery-section" aria-labelledby="gallery-title">
+      <div ref={headerRef} className={`gallery-section__header reveal${headerVisible ? ' visible' : ''}`}>
+        <div>
+          <div className="section-label">{GALLERY_SECTION.label}</div>
+          <h2 id="gallery-title" className="section-title-display">{GALLERY_SECTION.title}</h2>
+          <p className="gallery-section__sub">{GALLERY_SECTION.sub}</p>
+        </div>
+        <Link to={GALLERY_SECTION.homLink.to} className="link-arrow">
+          {GALLERY_SECTION.homLink.label} <IconArrow size={14} />
+        </Link>
+      </div>
+
+      <GalleryBrowser
+        items={items}
+        loading={loading}
+        error={error}
+        onRetry={reload}
+        filter={filter}
+        onFilterChange={setFilter}
+        limit={HOME_LIMIT}
+      />
+
+      {!loading && total > HOME_LIMIT && (
+        <div className="gallery-section__more">
+          <Link to={moreHref} className="btn-outline">
+            Ver todas as {total} obras <IconArrow size={14} />
           </Link>
         </div>
-
-        <div className={`gallery__filters reveal${headerVisible ? ' visible' : ''}`}
-          style={{ transitionDelay: '0.15s' }}>
-          {GALLERY_FILTERS.map(f => (
-            <button
-              key={f.key}
-              className={`gallery__filter-btn${filter === f.key ? ' active' : ''}`}
-              onClick={() => setFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(245,245,245,0.35)' }}>
-            A carregar…
-          </div>
-        ) : (
-          <div className="gallery__grid">
-            {filtered.map((item, i) => (
-              <div
-                key={item.id}
-                style={{
-                  opacity: 0,
-                  animation: `fadeUp 0.6s var(--ease-out) ${i * 0.06}s forwards`,
-                }}
-              >
-                <GalleryItem item={item} onOpen={setLightboxItem} />
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <Lightbox item={lightboxItem} onClose={() => setLightboxItem(null)} />
-    </>
+      )}
+    </section>
   )
 }

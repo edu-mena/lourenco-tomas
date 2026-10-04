@@ -13,7 +13,7 @@ export default function AdminGallery() {
   const [confirmId, setConfirmId] = useState(null)
 
   const filtered = galleryItems.filter(g => {
-    const matchSearch = g.label.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = (g.label ?? g.name ?? '').toLowerCase().includes(search.toLowerCase())
     const matchCat    = catFilter ? g.cat === catFilter : true
     return matchSearch && matchCat
   })

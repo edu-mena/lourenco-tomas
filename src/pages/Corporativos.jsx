@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
+import { useModal } from '../hooks/useModal'
 import { CORPORATE_PAGE } from '../data/ui'
-import { WA_NUMBER } from '../data/content'
 import { useCompanies } from '../hooks/useApi'
+import { waLink } from '../lib/whatsapp'
+import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -55,16 +57,11 @@ function ZoomIcon() {
 // ─── Lightbox ────────────────────────────────────────────────────
 
 function Lightbox({ image, onClose }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    const handler = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', handler)
-    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', handler) }
-  }, [onClose])
+  const ref = useModal(true, onClose)
 
   return (
-    <div className="hdet-lightbox" onClick={onClose}>
-      <button className="hdet-lightbox__close" onClick={onClose}><CloseIcon /></button>
+    <div ref={ref} className="hdet-lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label={image.title}>
+      <button className="hdet-lightbox__close" onClick={onClose} aria-label="Fechar"><CloseIcon /></button>
       <div className="hdet-lightbox__inner" onClick={e => e.stopPropagation()}>
         <img src={image.img} alt={image.title} className="hdet-lightbox__img" />
         <p className="hdet-lightbox__caption">{image.title}</p>
@@ -75,16 +72,9 @@ function Lightbox({ image, onClose }) {
 
 // ─── Company Card ─────────────────────────────────────────────────
 
-function CompanyCard({ company, index, onOpen }) {
-  const [hovered, setHovered] = useState(false)
-
+function CompanyCard({ company, index, onOpen, onShowWorks }) {
   return (
-    <div
-      className="corp2-card"
-      style={{ '--i': index }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <div id={`empresa-${company.slug}`} className="corp2-card" style={{ '--i': index }}>
       <div className="corp2-card__cover">
         <img src={company.cover} alt={company.name} loading="lazy" />
         <div className="corp2-card__cover-grad" />
@@ -120,15 +110,18 @@ function CompanyCard({ company, index, onOpen }) {
             </button>
           ))}
           {company.works.length > 3 && (
-            <div className="corp2-card__thumb corp2-card__thumb--more">
+            <button className="corp2-card__thumb corp2-card__thumb--more" onClick={() => onShowWorks(company.slug)}
+              aria-label={`Ver as ${company.works.length} obras de ${company.name}`}>
               +{company.works.length - 3}
-            </div>
+            </button>
           )}
         </div>
 
-        <Link to={`/corporativos/${company.slug}`} className="corp2-card__link">
-          Ver portfolio completo <ArrowIcon />
-        </Link>
+        {company.works.length > 0 && (
+          <button type="button" className="corp2-card__link" onClick={() => onShowWorks(company.slug)}>
+            Ver as {company.works.length} obras <ArrowIcon />
+          </button>
+        )}
       </div>
     </div>
   )
@@ -136,7 +129,7 @@ function CompanyCard({ company, index, onOpen }) {
 
 // ─── Works Grid Item ─────────────────────────────────────────────
 
-function WorkGridItem({ work, companyName, companySlug, index, onOpen }) {
+function WorkGridItem({ work, companyName, companySlug, index, onOpen, onShowCompany }) {
   return (
     <div className="corp2-work" style={{ '--i': index }}>
       <button className="corp2-work__img-wrap" onClick={() => onOpen(work)} aria-label={`Ver ${work.title}`}>
@@ -152,9 +145,9 @@ function WorkGridItem({ work, companyName, companySlug, index, onOpen }) {
           <span className="corp2-work__company">{companyName}</span>
           <span className="corp2-work__year">{work.year}</span>
         </div>
-        <Link to={`/corporativos/${companySlug}`} className="corp2-work__link">
+        <button type="button" className="corp2-work__link" onClick={() => onShowCompany(companySlug)}>
           Ver empresa <ArrowIcon />
-        </Link>
+        </button>
       </div>
     </div>
   )
@@ -166,6 +159,7 @@ export default function Corporativos() {
   const [view, setView]                 = useState(CORPORATE_PAGE.views[0].key)
   const [filter, setFilter]             = useState(CORPORATE_PAGE.filters[0])
   const [lightboxWork, setLightboxWork] = useState(null)
+  const [company, setCompany]           = useState(null)
 
   const [statsRef,   statsVisible]   = useScrollReveal()
   const [cardsRef,   cardsVisible]   = useScrollReveal()
@@ -174,14 +168,31 @@ export default function Corporativos() {
   const [servRef,    servVisible]    = useScrollReveal()
   const [ctaRef,     ctaVisible]     = useScrollReveal()
 
-  const { companies: COMPANIES, loading } = useCompanies()
+  const { companies: COMPANIES, loading, error, reload } = useCompanies()
 
   const allWorks = COMPANIES.flatMap(c =>
     c.works.map(w => ({ ...w, companyName: c.name, companySlug: c.slug }))
   )
-  const filteredWorks = filter === CORPORATE_PAGE.filters[0]
-    ? allWorks
-    : allWorks.filter(w => w.type === filter)
+  const filteredWorks = allWorks
+    .filter(w => filter === CORPORATE_PAGE.filters[0] || w.type === filter)
+    .filter(w => !company || w.companySlug === company)
+  const companyName = company && COMPANIES.find(c => c.slug === company)?.name
+
+  const scrollToEl = id => setTimeout(() => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, 50)
+
+  // Ver as obras de uma empresa = vista "Todas as obras" filtrada por essa empresa
+  const showCompanyWorks = slug => {
+    setCompany(slug)
+    setFilter(CORPORATE_PAGE.filters[0])
+    setView(CORPORATE_PAGE.views[1].key)
+    scrollToEl('corp-toolbar')
+  }
+  const showCompany = slug => {
+    setView(CORPORATE_PAGE.views[0].key)
+    scrollToEl(`empresa-${slug}`)
+  }
 
   const dynamicNums = [
     COMPANIES.length,
@@ -190,53 +201,35 @@ export default function Corporativos() {
     null,
   ]
 
-  const heroLines = CORPORATE_PAGE.hero.title.split('\n')
-
   return (
     <>
       {lightboxWork && (
         <Lightbox image={lightboxWork} onClose={() => setLightboxWork(null)} />
       )}
 
-      {/* ── Page Hero ── */}
-      <div className="page-hero">
-        <p className="page-hero__breadcrumb">
-          <Link to="/">Início</Link> / {CORPORATE_PAGE.hero.breadcrumb}
-        </p>
-        <h1 className="page-hero__title">
-          {heroLines.map((line, i) => (
-            <span key={i}>{line}{i < heroLines.length - 1 && <br/>}</span>
-          ))}
-        </h1>
-        <p className="page-hero__sub">{CORPORATE_PAGE.hero.subtitle}</p>
-        <div className="page-hero__deco">{CORPORATE_PAGE.hero.deco}</div>
-      </div>
+      <PageHero {...CORPORATE_PAGE.hero} />
 
-      {loading && (
-        <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(245,245,245,0.35)' }}>
-          A carregar…
-        </div>
-      )}
+      {loading && <section className="corp2-section"><SkeletonGrid count={3} variant="cards" /></section>}
+      {error && <ErrorState message="Não foi possível carregar os projectos." onRetry={reload} />}
 
       {/* ── Stats Strip ── */}
       <div ref={statsRef} className={`corp2-stats reveal${statsVisible ? ' visible' : ''}`}>
         {CORPORATE_PAGE.stats.map((s, i) => (
-          <div key={s.label} className="corp2-stats__item"
-            style={i < CORPORATE_PAGE.stats.length - 1 ? {} : {}}>
+          <div key={s.label} className="corp2-stats__item">
             <span className="corp2-stats__num">{dynamicNums[i] ?? s.num}</span>
             <span className="corp2-stats__label">{s.label}</span>
-            {i < CORPORATE_PAGE.stats.length - 1 && <div className="corp2-stats__divider" style={{ display: 'none' }} />}
           </div>
         ))}
       </div>
 
       {/* ── Toolbar ── */}
-      <div className="corp2-toolbar">
+      <div id="corp-toolbar" className="corp2-toolbar">
         <div className="corp2-toolbar__views">
           {CORPORATE_PAGE.views.map(v => (
             <button
               key={v.key}
               className={`corp2-view-btn${view === v.key ? ' active' : ''}`}
+              aria-pressed={view === v.key}
               onClick={() => setView(v.key)}
             >
               {v.key === 'empresas' ? (
@@ -257,9 +250,15 @@ export default function Corporativos() {
 
         {view === CORPORATE_PAGE.views[1].key && (
           <div className="corp2-toolbar__filters">
+            {companyName && (
+              <button className="filter-chip" onClick={() => setCompany(null)} aria-label={`Remover filtro ${companyName}`}>
+                {CORPORATE_PAGE.companyFilterLabel}: {companyName} <span aria-hidden="true">×</span>
+              </button>
+            )}
             {CORPORATE_PAGE.filters.map(t => (
               <button
                 key={t}
+                aria-pressed={filter === t}
                 className={`blog-filter-btn${filter === t ? ' active' : ''}`}
                 onClick={() => setFilter(t)}
               >
@@ -278,7 +277,7 @@ export default function Corporativos() {
             className={`corp2-cards-grid${cardsVisible ? ' corp2-cards-grid--visible' : ''}`}
           >
             {COMPANIES.map((c, i) => (
-              <CompanyCard key={c.id} company={c} index={i} onOpen={setLightboxWork} />
+              <CompanyCard key={c.id} company={c} index={i} onOpen={setLightboxWork} onShowWorks={showCompanyWorks} />
             ))}
           </div>
         </section>
@@ -300,6 +299,7 @@ export default function Corporativos() {
                   companySlug={w.companySlug}
                   index={i}
                   onOpen={setLightboxWork}
+                  onShowCompany={showCompany}
                 />
               ))}
             </div>
@@ -339,7 +339,7 @@ export default function Corporativos() {
           <div className="corp2-services__grid">
             {CORPORATE_PAGE.services.map((s, i) => (
               <div key={i} className="corp2-service">
-                <span className="corp2-service__icon">{s.icon}</span>
+                <span className="corp2-service__icon">{String(i + 1).padStart(2, '0')}</span>
                 <h4 className="corp2-service__title">{s.title}</h4>
                 <p className="corp2-service__desc">{s.desc}</p>
                 <span className="corp2-service__detail">{s.detail}</span>
@@ -357,12 +357,12 @@ export default function Corporativos() {
             {CORPORATE_PAGE.cta.title[0]}<br /><span>{CORPORATE_PAGE.cta.title[1]}</span>
           </h2>
           <p className="hom-cta__desc">{CORPORATE_PAGE.cta.description}</p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="page-cta__btns">
             <Link to="/contacto" className="btn-primary">
               {CORPORATE_PAGE.cta.primaryBtn} <ArrowIcon />
             </Link>
             <a
-              href={`https://wa.me/${WA_NUMBER}`}
+              href={waLink('Olá Lourenço! Gostaria de pedir um orçamento para a minha empresa.')}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline"
@@ -410,7 +410,7 @@ export default function Corporativos() {
         }
         .corp2-stats__label {
           font-family: var(--ff-mono);
-          font-size: 0.62rem;
+          font-size: 0.7rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
           color: rgba(245,245,245,0.38);
@@ -511,7 +511,7 @@ export default function Corporativos() {
           position: absolute;
           top: 14px; left: 14px;
           font-family: var(--ff-mono);
-          font-size: 0.58rem;
+          font-size: 0.66rem;
           letter-spacing: 0.22em;
           color: rgba(255,255,255,0.55);
           background: rgba(13,13,13,0.6);
@@ -523,7 +523,7 @@ export default function Corporativos() {
           position: absolute;
           top: 14px; right: 14px;
           font-family: var(--ff-mono);
-          font-size: 0.58rem;
+          font-size: 0.66rem;
           letter-spacing: 0.16em;
           color: var(--beige);
           background: rgba(13,13,13,0.65);
@@ -570,7 +570,7 @@ export default function Corporativos() {
         }
         .corp2-card__pill {
           font-family: var(--ff-mono);
-          font-size: 0.52rem;
+          font-size: 0.7rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: rgba(214,194,168,0.7);
@@ -627,7 +627,7 @@ export default function Corporativos() {
           font-size: 1.1rem;
           font-weight: 900;
           color: rgba(214,194,168,0.5);
-          cursor: default;
+          cursor: pointer;
         }
 
         .corp2-card__link {
@@ -635,7 +635,7 @@ export default function Corporativos() {
           align-items: center;
           gap: 7px;
           font-family: var(--ff-mono);
-          font-size: 0.62rem;
+          font-size: 0.7rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: var(--beige);
@@ -702,7 +702,7 @@ export default function Corporativos() {
         }
         .corp2-work__type {
           font-family: var(--ff-mono);
-          font-size: 0.55rem;
+          font-size: 0.64rem;
           letter-spacing: 0.28em;
           text-transform: uppercase;
           color: var(--beige);
@@ -722,14 +722,14 @@ export default function Corporativos() {
         }
         .corp2-work__company {
           font-family: var(--ff-mono);
-          font-size: 0.6rem;
+          font-size: 0.68rem;
           letter-spacing: 0.12em;
           color: rgba(255,255,255,0.35);
           text-transform: uppercase;
         }
         .corp2-work__year {
           font-family: var(--ff-mono);
-          font-size: 0.58rem;
+          font-size: 0.66rem;
           color: rgba(255,255,255,0.25);
         }
         .corp2-work__link {
@@ -737,7 +737,7 @@ export default function Corporativos() {
           align-items: center;
           gap: 5px;
           font-family: var(--ff-mono);
-          font-size: 0.58rem;
+          font-size: 0.66rem;
           letter-spacing: 0.16em;
           text-transform: uppercase;
           color: rgba(214,194,168,0.55);
@@ -827,7 +827,7 @@ export default function Corporativos() {
         }
         .corp2-service:last-child { border-right: none; }
         .corp2-service:hover { background: rgba(214,194,168,0.03); }
-        .corp2-service__icon { font-size: 1.8rem; }
+        .corp2-service__icon { font-size: 0.8rem; letter-spacing: 0.12em; color: var(--beige); font-weight: 500; }
         .corp2-service__title {
           font-family: var(--ff-display);
           font-size: 1.2rem;
@@ -842,7 +842,7 @@ export default function Corporativos() {
         }
         .corp2-service__detail {
           font-family: var(--ff-mono);
-          font-size: 0.62rem;
+          font-size: 0.7rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           color: var(--beige);

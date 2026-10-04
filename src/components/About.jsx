@@ -1,22 +1,19 @@
 import { useScrollReveal } from '../hooks'
 import { Link } from 'react-router-dom'
 import { ABOUT_SECTION } from '../data/ui'
-import { mediaUrl } from '../data/media'
+import { IconArrow } from './icons'
 
 function ArtCard({ label, desc, img, filterKey }) {
   return (
     <Link to={`/obras?filter=${filterKey}`} className="art-card">
       <div className="art-card__img-wrap">
-        <img src={img} alt={label} loading="lazy" className="art-card__img" />
+        <img src={img} alt="" loading="lazy" className="art-card__img" />
       </div>
       <div className="art-card__body">
         <span className="art-card__label">{label}</span>
         <p className="art-card__desc">{desc}</p>
         <span className="art-card__cta">
-          Ver obras
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" width="12" height="12">
-            <path d="M3 8h10M9 4l4 4-4 4"/>
-          </svg>
+          {ABOUT_SECTION.ctaLabel} <IconArrow size={12} />
         </span>
       </div>
     </Link>
@@ -29,24 +26,25 @@ export default function About() {
   const [cardsRef, cardsVisible] = useScrollReveal()
 
   return (
-    <section id="about" className="about" aria-label="Sobre o Artista">
+    <section id="about" className="about" aria-labelledby="about-title">
       <div ref={imgRef} className={`about__visual reveal-left${imgVisible ? ' visible' : ''}`}>
         <div className="about__img-frame">
           <img
             className="about__img"
-            src={mediaUrl('/images/about/santuario1.jpeg')}
-            alt="Arte — Lourenço Tomas"
+            src={ABOUT_SECTION.image}
+            alt={ABOUT_SECTION.imageAlt}
             loading="lazy"
           />
         </div>
       </div>
 
       <div ref={textRef} className={`about__text reveal-right${textVisible ? ' visible' : ''}`}>
-        <div className="section-label">Sobre o Artista</div>
-
-        <p className="about__body">
-          {ABOUT_SECTION.body[0]}
-        </p>
+        <div className="section-label">{ABOUT_SECTION.label}</div>
+        <h2 id="about-title" className="about__heading">{ABOUT_SECTION.heading}</h2>
+        <p className="about__body">{ABOUT_SECTION.body[0]}</p>
+        <Link to="/sobre" className="link-arrow about__more">
+          {ABOUT_SECTION.moreLabel} <IconArrow size={14} />
+        </Link>
 
         <div ref={cardsRef} className={`art-cards${cardsVisible ? ' art-cards--visible' : ''}`}>
           {ABOUT_SECTION.cards.map((a, i) => (

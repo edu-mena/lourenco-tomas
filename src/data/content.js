@@ -1,16 +1,17 @@
 import { mediaUrl } from './media'
 
-/* ── Navigation ─────────────────────────────────── */
-export const NAV_LINKS = [
-  { label: 'Sobre', href: '#about' },
-  { label: 'Obras', href: '#gallery' },
-  { label: 'Processo', href: '#process' },
-  { label: 'Clientes', href: '#testimonials' },
-]
-
 /* ── Gallery ────────────────────────────────────── */
 export const WA_NUMBER = '244923340114'
+export const WA_DISPLAY = '+244 923 340 114'
 export const WA_DEFAULT_MESSAGE = 'Olá Lourenço! Gostaria de encomendar uma peça.'
+
+/* Contactos canónicos — usar sempre estes, nunca repetir os valores noutros ficheiros */
+export const CONTACT_EMAIL = 'lourencotomas_@aovc.ao'
+export const INSTAGRAM_HANDLE = '@lourencotomas_'
+export const INSTAGRAM_URL = 'https://www.instagram.com/lourencotomas_/'
+/* Substituir pelo link exacto do ateliê no Google Maps quando houver */
+export const LOCATION_LABEL = 'Luanda, Angola'
+export const LOCATION_URL = 'https://www.google.com/maps/search/?api=1&query=Luanda%2C+Angola'
 const encodeWaMessage = (text) => encodeURIComponent(text)
 
 export const GALLERY_ITEMS = [
@@ -84,14 +85,6 @@ export const GALLERY_FILTERS = [
   { key: 'calcados', label: 'Calçados' },
 ]
 
-/* ── Palette per category for canvas art ────────── */
-export const ART_PALETTE = {
-  tshirts: ['rgba(190,128,58,', 'rgba(230,175,95,', 'rgba(155,95,38,'],
-  telas:   ['rgba(85,105,168,', 'rgba(65,85,148,',  'rgba(108,128,190,'],
-  murais:  ['rgba(62,125,68,',  'rgba(82,148,88,',  'rgba(52,105,58,'],
-  calcados:['rgba(148,62,108,', 'rgba(168,82,128,', 'rgba(128,52,95,'],
-}
-
 /* ── Testimonials ───────────────────────────────── */
 export const TESTIMONIALS = [
   {
@@ -119,10 +112,11 @@ export const TESTIMONIALS = [
 
 /* ── Timeline ───────────────────────────────────── */
 export const TIMELINE = [
-  { year: '2013', event: 'Início da jornada artística — primeiros experimentos com aerografia em Luanda' },
-  { year: '2016', event: 'Primeiro mural público — projecto de arte urbana no centro de Luanda' },
-  { year: '2019', event: 'Lançamento da linha de customização exclusiva de vestuário e calçado' },
-  { year: '2023', event: 'Exposição colectiva internacional — reconhecimento da arte africana contemporânea' },
+  { year: '1982', event: 'Nasce em Luanda, sétimo de dez filhos. Cresce entre a oficina de bate-chapa e pintura automóvel do pai.' },
+  { year: '2003', event: 'Entra na Escola Nacional de Artes Plásticas (ENAP), onde se destaca no desenho.' },
+  { year: '2007', event: 'Dedica-se ao design gráfico — dez anos a trabalhar com empresas angolanas.' },
+  { year: '2017', event: 'Regressa às artes plásticas e começa a dominar a aerografia, de forma autodidata.' },
+  { year: '2018', event: 'Primeira exposição individual de aerografia: «Seguindo o Sonho».' },
 ]
 
 /* ── Videos ─────────────────────────────────────── */
@@ -141,16 +135,15 @@ export const VIDEOS = [
     grad: 'linear-gradient(150deg,#120908 0%,#221110 40%,#2c1715 60%,#1c0d0c 85%,#0d0808 100%)' },
 ]
 
-/* ── WhatsApp Config ────────────────────────────── */
 /* ── Social Links ───────────────────────────────── */
 export const SOCIAL_LINKS = [
-  { id: 'whatsapp', label: 'WhatsApp', handle: '+244 923 340 114',
+  { id: 'whatsapp', label: 'WhatsApp', handle: WA_DISPLAY, copy: WA_DISPLAY,
     href: `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(WA_DEFAULT_MESSAGE)}`,
     icon: 'whatsapp' },
-  { id: 'instagram', label: 'Instagram', handle: '@lourencotomas_',
-    href: 'https://www.instagram.com/lourencotomas_/', icon: 'instagram' },
-  { id: 'facebook', label: 'Facebook', handle: 'Lourenço Tomas Arte',
+  { id: 'instagram', label: 'Instagram', handle: INSTAGRAM_HANDLE,
+    href: INSTAGRAM_URL, icon: 'instagram' },
+  { id: 'facebook', label: 'Facebook', handle: 'Lourenço Tomás Arte',
     href: 'https://facebook.com/lourenco.tomas.art', icon: 'facebook' },
-  { id: 'email', label: 'Email', handle: 'lourencotomas_@aovc.ao',
-    href: 'mailto:lourenco.tomas@aovc.ao', icon: 'email' },
+  { id: 'email', label: 'Email', handle: CONTACT_EMAIL, copy: CONTACT_EMAIL,
+    href: `mailto:${CONTACT_EMAIL}`, icon: 'email' },
 ]

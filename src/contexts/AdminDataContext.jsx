@@ -6,8 +6,17 @@ import { COMPANIES as INITIAL_COMPANIES } from '../data/corporativos'
 import {
   HERO_CONTENT, ABOUT_SECTION, ABOUT_PAGE,
   FOOTER_CONTENT, NAV_BRAND,
-  CONTACT_SECTION, CONTACTO_PAGE, ORDER_PAGE,
+  CONTACT_SECTION, CONTACTO_PAGE, ORDER_PAGE, SERVICE_OPTIONS,
 } from '../data/ui'
+
+// A Home já não tem formulário (a encomenda vive em /encomendas), mas o ecrã
+// de definições ainda edita estes campos — mantém-se a forma esperada.
+const LEGACY_CONTACT_FORM = {
+  name: { label: 'Nome', placeholder: 'O seu nome' },
+  email: { label: 'Email', placeholder: 'o.seu@email.com' },
+  message: { label: 'Mensagem', placeholder: '' },
+  service: { label: 'Tipo de obra', options: SERVICE_OPTIONS },
+}
 
 const AdminDataContext = createContext(null)
 
@@ -25,9 +34,9 @@ export function AdminDataProvider({ children }) {
   const [siteSettings, setSiteSettings] = useState({
     hero:    { ...HERO_CONTENT },
     about:   { section: { ...ABOUT_SECTION }, page: { ...ABOUT_PAGE } },
-    footer:  { ...FOOTER_CONTENT },
+    footer:  { quote: '', ...FOOTER_CONTENT },
     nav:     { ...NAV_BRAND },
-    contact: { section: { ...CONTACT_SECTION }, page: { ...CONTACTO_PAGE } },
+    contact: { section: { form: LEGACY_CONTACT_FORM, ...CONTACT_SECTION }, page: { ...CONTACTO_PAGE } },
     orders:  { ...ORDER_PAGE },
   })
 

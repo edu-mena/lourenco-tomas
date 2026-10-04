@@ -13,6 +13,8 @@ import Homenagens from './pages/Homenagens'
 import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import HomenagensDetalhe from './pages/HomenagensDetalhe'
+import NotFound from './pages/NotFound'
+import Contactos from './pages/Contactos'
 
 // Admin
 import { AdminDataProvider } from './contexts/AdminDataContext'
@@ -40,8 +42,9 @@ function Layout({ children }) {
   return (
     <>
       <Cursor />
+      <a href="#conteudo" className="skip-link">Saltar para o conteúdo</a>
       <Nav />
-      <main>{children}</main>
+      <main id="conteudo" tabIndex={-1}>{children}</main>
       <Footer />
       <WhatsApp />
     </>
@@ -64,6 +67,9 @@ export default function App() {
         <Route path="/homenagens/:slug" element={<Layout><HomenagensDetalhe /></Layout>} />
         <Route path="/blog" element={<Layout><Blog /></Layout>} />
         <Route path="/blog/:slug" element={<Layout><BlogPost /></Layout>} />
+
+        {/* Página de links (tipo Linktree) — sem Nav nem Footer */}
+        <Route path="/contactos" element={<><Cursor /><Contactos /></>} />
 
         {/* Admin — sem Nav/Footer/Cursor públicos */}
         <Route path="/admin" element={<AdminDataProvider><AdminLayout /></AdminDataProvider>}>
@@ -92,6 +98,8 @@ export default function App() {
           <Route path="settings/orders" element={<AdminOrders />} />
           <Route path="settings/footer" element={<AdminFooter />} />
         </Route>
+
+        <Route path="*" element={<Layout><NotFound /></Layout>} />
       </Routes>
     </>
   )

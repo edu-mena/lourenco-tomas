@@ -1,170 +1,206 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useId } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { ORDER_PAGE } from '../data/ui'
+import { useForm, rules } from '../hooks/useForm'
+import { ORDER_PAGE, SERVICE_OPTIONS } from '../data/ui'
+import { buildMessage, openWhatsApp, waLink, mailLink } from '../lib/whatsapp'
+import { PageHero, Field, SentPanel } from '../components/ui'
+import { IconArrow, IconWhatsApp } from '../components/icons'
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false)
+  const id = useId()
   return (
     <div className={`faq-item${open ? ' open' : ''}`}>
-      <button className="faq-item__q" onClick={() => setOpen(v => !v)}>
+      <button className="faq-item__q" onClick={() => setOpen(v => !v)} aria-expanded={open} aria-controls={id}>
         {q}
-        <span className="faq-item__icon">
+        <span className="faq-item__icon" aria-hidden="true">
           <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" width="12" height="12">
-            <path d="M6 2v8M2 6h8"/>
+            <path d="M6 2v8M2 6h8" />
           </svg>
         </span>
       </button>
-      <div className="faq-item__a">
-        <p>{a}</p>
+      <div className="faq-item__a" id={id} role="region">
+        <div><p>{a}</p></div>
       </div>
     </div>
   )
 }
 
+const SCHEMA = {
+  name: [rules.required('Indique o seu nome.')],
+  email: [rules.email()],
+  service: [rules.required('Escolha o tipo de obra.')],
+  desc: [rules.required('Descreva a sua ideia.'), rules.minLength(15, 'Conte-nos um pouco mais (mín. 15 caracteres).')],
+}
+
+const serviceLabel = v => SERVICE_OPTIONS.find(o => o.value === v)?.label ?? v
+
 export default function Encomendas() {
-  const [sent, setSent] = useState(false)
+  const [params] = useSearchParams()
   const [servicesRef, servicesVisible] = useScrollReveal()
   const [stepsRef, stepsVisible] = useScrollReveal()
-  const [formRef, formVisible] = useScrollReveal()
-  const [faqRef, faqVisible] = useScrollReveal()
+  const [sentMsg, setSentMsg] = useState(null)
 
   const { hero, sectionLabels, sectionTitles, services, steps, faqs, form } = ORDER_PAGE
+  const f = form.fields
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setSent(true)
-    setTimeout(() => setSent(false), 3500)
-    e.target.reset()
+  // Pré-preenchido a partir da galeria: /encomendas?servico=tela&ref=Nome
+  const ref = params.get('ref')
+  const presetService = params.get('servico')
+  const order = useForm({
+    idPrefix: 'enc',
+    schema: SCHEMA,
+    initial: {
+      name: '', email: '', phone: '', size: '', deadline: '',
+      service: SERVICE_OPTIONS.some(o => o.value === presetService) ? presetService : '',
+      desc: ref ? `${form.reference(ref)}\n\n` : '',
+    },
+  })
+
+  // Vindo de "Encomendar algo assim": foca a descrição, pronta a escrever
+  useEffect(() => {
+    if (!ref) return
+    const t = setTimeout(() => {
+      const el = document.getElementById('enc-desc')
+      el?.focus({ preventScroll: true })
+      el?.setSelectionRange(el.value.length, el.value.length)
+    }, 700)
+    return () => clearTimeout(t)
+  }, [ref])
+
+  const chooseService = value => {
+    order.setValue('service', value)
+    document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' })
+    setTimeout(() => {
+      const firstEmpty = ['name', 'desc'].find(n => !order.values[n].trim())
+      document.getElementById(`enc-${firstEmpty || 'desc'}`)?.focus({ preventScroll: true })
+    }, 600)
   }
+
+  const submit = order.handleSubmit(v => {
+    const msg = buildMessage('Pedido de encomenda — website', [
+      ['Nome', v.name],
+      ['Email', v.email],
+      ['Telefone', v.phone],
+      ['Tipo de obra', serviceLabel(v.service)],
+      ['Dimensões', v.size],
+      ['Prazo', v.deadline],
+    ], v.desc.trim())
+    openWhatsApp(msg)
+    setSentMsg(msg)
+  })
+
+  const resetForm = () => { order.reset(); setSentMsg(null) }
 
   return (
     <>
-      {/* ── Page Hero ─────────────────────────────── */}
-      <div className="page-hero">
-        <div className="page-hero__breadcrumb">
-          <Link to="/">Início</Link>
-          <span> / {hero.breadcrumb}</span>
-        </div>
-        <h1 className="page-hero__title">
-          {hero.title.split('\n').map((line, i, arr) => (
-            <span key={i}>{line}{i < arr.length - 1 && <br/>}</span>
-          ))}
-        </h1>
-        <p className="page-hero__sub">{hero.subtitle}</p>
-        <div className="page-hero__deco" aria-hidden>{hero.deco}</div>
-      </div>
+      <PageHero {...hero} />
 
-      {/* ── Serviços ──────────────────────────────── */}
+      {/* ── Serviços — cada cartão leva ao formulário com o serviço escolhido ── */}
       <section className="services-section">
         <div ref={servicesRef} className={`reveal${servicesVisible ? ' visible' : ''}`}>
           <div className="section-label">{sectionLabels.services}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>{sectionTitles.services}</h2>
+          <h2 className="section-title-display section-title-display--spaced">{sectionTitles.services}</h2>
           <div className="services-grid">
             {services.map(s => (
-              <div key={s.title} className="service-card">
-                <span className="service-card__icon">{s.icon}</span>
+              <article key={s.title} className="service-card">
+                <div className="service-card__img"><img src={s.img} alt="" loading="lazy" /></div>
                 <h3 className="service-card__title">{s.title}</h3>
                 <p className="service-card__desc">{s.desc}</p>
                 <div className="service-card__price">{s.price}</div>
                 <ul className="service-card__includes">
                   {s.includes.map(item => <li key={item}>{item}</li>)}
                 </ul>
-              </div>
+                <button type="button" className="service-card__cta" onClick={() => chooseService(s.value)}>
+                  {ORDER_PAGE.serviceCta} {s.title.toLowerCase()} <IconArrow size={13} />
+                </button>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Como Funciona ─────────────────────────── */}
+      {/* ── Como funciona ── */}
       <section className="order-process">
         <div ref={stepsRef} className={`reveal${stepsVisible ? ' visible' : ''}`}>
           <div className="section-label">{sectionLabels.process}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>{sectionTitles.process}</h2>
-          <div className="order-process__grid">
+          <h2 className="section-title-display section-title-display--spaced">{sectionTitles.process}</h2>
+          <ol className="order-process__grid">
             {steps.map(s => (
-              <div key={s.num} className="order-step">
+              <li key={s.num} className="order-step">
                 <div className="order-step__num">{s.num}</div>
                 <h3 className="order-step__title">{s.title}</h3>
                 <p className="order-step__desc">{s.desc}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* ── Formulário ────────────────────────────── */}
-      <section className="encomendas-form-section">
-        <div ref={formRef} className={`encomendas-form-inner reveal${formVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.form}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>{sectionTitles.form}</h2>
+      {/* ── Pedido + dúvidas lado a lado ── */}
+      <section id="formulario" className="encomendas-form-section" data-hide-wa>
+        <div className="encomendas-layout">
+          <div className="encomendas-form-inner">
+            <div className="section-label">{sectionLabels.form}</div>
+            <h2 className="section-title-display section-title-display--spaced">{sectionTitles.form}</h2>
 
-          <form className="contact__form encomendas-form" onSubmit={handleSubmit} noValidate>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-name">{form.fields.name.label}</label>
-                <input id="enc-name" className="form-input" type="text" placeholder={form.fields.name.placeholder} required />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-email">{form.fields.email.label}</label>
-                <input id="enc-email" className="form-input" type="email" placeholder={form.fields.email.placeholder} required />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-phone">{form.fields.phone.label}</label>
-                <input id="enc-phone" className="form-input" type="tel" placeholder={form.fields.phone.placeholder} />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-service">{form.fields.service.label}</label>
-                <select id="enc-service" className="form-select" required>
-                  {form.fields.service.options.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-size">{form.fields.size.label}</label>
-                <input id="enc-size" className="form-input" type="text" placeholder={form.fields.size.placeholder} />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="enc-deadline">{form.fields.deadline.label}</label>
-                <input id="enc-deadline" className="form-input" type="text" placeholder={form.fields.deadline.placeholder} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="enc-desc">{form.fields.desc.label}</label>
-              <textarea
-                id="enc-desc"
-                className="form-textarea"
-                placeholder={form.fields.desc.placeholder}
-                required
+            {sentMsg ? (
+              <SentPanel
+                title={form.sent.title}
+                body={form.sent.body}
+                waHref={waLink(sentMsg)}
+                mailHref={mailLink('Pedido de encomenda', sentMsg.replace(/\*/g, ''))}
+                onReset={resetForm}
+                resetLabel="Fazer outro pedido"
               />
-            </div>
-            <button type="submit" className={`form-submit${sent ? ' form-submit--sent' : ''}`}>
-              {sent ? form.submit.sent : (
-                <>
-                  {form.submit.default}
-                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M3 8h10M9 4l4 4-4 4"/>
-                  </svg>
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-      </section>
-
-      {/* ── FAQ ───────────────────────────────────── */}
-      <section className="faq-section">
-        <div ref={faqRef} className={`faq-inner reveal${faqVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.faq}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>{sectionTitles.faq}</h2>
-          <div className="faq-list">
-            {faqs.map(f => <FaqItem key={f.q} {...f} />)}
+            ) : (
+              <form ref={order.formRef} className="contact__form" onSubmit={submit} noValidate>
+                <div className="form-row">
+                  <Field label={f.name.label} htmlFor="enc-name" error={order.errorFor('name')}>
+                    <input className="form-input" type="text" autoComplete="name" placeholder={f.name.placeholder} {...order.field('name')} />
+                  </Field>
+                  <Field label={f.service.label} htmlFor="enc-service" error={order.errorFor('service')}>
+                    <select className="form-select" {...order.field('service')}>
+                      {SERVICE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                  </Field>
+                </div>
+                <div className="form-row">
+                  <Field label={f.email.label} htmlFor="enc-email" optional error={order.errorFor('email')}>
+                    <input className="form-input" type="email" autoComplete="email" placeholder={f.email.placeholder} {...order.field('email')} />
+                  </Field>
+                  <Field label={f.phone.label} htmlFor="enc-phone" optional>
+                    <input className="form-input" type="tel" autoComplete="tel" placeholder={f.phone.placeholder} {...order.field('phone')} />
+                  </Field>
+                </div>
+                <div className="form-row">
+                  <Field label={f.size.label} htmlFor="enc-size" optional>
+                    <input className="form-input" type="text" placeholder={f.size.placeholder} {...order.field('size')} />
+                  </Field>
+                  <Field label={f.deadline.label} htmlFor="enc-deadline" optional>
+                    <input className="form-input" type="text" placeholder={f.deadline.placeholder} {...order.field('deadline')} />
+                  </Field>
+                </div>
+                <Field label={f.desc.label} htmlFor="enc-desc" hint={f.desc.hint} error={order.errorFor('desc')}>
+                  <textarea className="form-textarea" placeholder={f.desc.placeholder} rows={6} {...order.field('desc')} />
+                </Field>
+                <div className="form-actions">
+                  <button type="submit" className="form-submit">
+                    <IconWhatsApp size={16} /> {form.submit}
+                  </button>
+                  <p className="form-note">{form.note}</p>
+                </div>
+              </form>
+            )}
           </div>
+
+          <aside className="faq-aside" aria-labelledby="faq-title">
+            <h2 id="faq-title" className="faq-aside__title">{sectionLabels.faq}</h2>
+            <div className="faq-list">
+              {faqs.map(q => <FaqItem key={q.q} {...q} />)}
+            </div>
+          </aside>
         </div>
       </section>
     </>

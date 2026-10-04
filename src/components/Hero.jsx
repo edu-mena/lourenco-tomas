@@ -1,25 +1,19 @@
 import { Fragment } from 'react'
+import { Link } from 'react-router-dom'
 import { HERO_CONTENT } from '../data/ui'
-
-function ArrowRight() {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M3 8h10M9 4l4 4-4 4"/>
-    </svg>
-  )
-}
+import { IconArrow } from './icons'
 
 export default function Hero() {
-  const scrollTo = (href) => {
-    const el = document.querySelector(href)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  const scrollToGallery = () => {
+    document.querySelector('#gallery')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <section id="hero" className="hero">
+    <section id="hero" className="hero" data-spray>
       <div className="hero__overlay" />
 
       <div className="hero__content">
+        <p className="hero__eyebrow">{HERO_CONTENT.eyebrow}</p>
         <h1 className="hero__title">
           {HERO_CONTENT.title.map((line, index) => (
             <Fragment key={index}>
@@ -29,24 +23,22 @@ export default function Hero() {
           ))}
         </h1>
 
-        <p className="hero__subtitle">
-          {HERO_CONTENT.subtitle}
-        </p>
+        <p className="hero__subtitle">{HERO_CONTENT.subtitle}</p>
 
         <div className="hero__cta-wrap">
-          <button className="btn-primary" onClick={() => scrollTo('#gallery')}>
-            {HERO_CONTENT.ctaPrimary} <ArrowRight />
+          <button className="btn-primary" onClick={scrollToGallery}>
+            {HERO_CONTENT.ctaPrimary} <IconArrow size={15} />
           </button>
-          <button className="btn-ghost" onClick={() => scrollTo('#contact')}>
+          <Link className="btn-ghost" to="/encomendas">
             {HERO_CONTENT.ctaSecondary}
-          </button>
+          </Link>
         </div>
       </div>
 
-      <div className="hero__scroll">
-        <div className="hero__scroll-line" />
+      <button className="hero__scroll" onClick={scrollToGallery}>
+        <span className="hero__scroll-line" aria-hidden="true" />
         {HERO_CONTENT.scrollLabel}
-      </div>
+      </button>
     </section>
   )
 }

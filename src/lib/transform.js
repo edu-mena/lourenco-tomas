@@ -1,5 +1,6 @@
-const INSTAGRAM_URL = 'https://instagram.com/lourenco.tomas.art'
-const WA_NUMBER = '244923340114'
+import { INSTAGRAM_URL } from '../data/content'
+import { waLink } from './whatsapp'
+
 const DEFAULT_GRAD = 'linear-gradient(145deg,#1a0d06 0%,#3a1e0c 35%,#4d2a12 55%,#281508 80%,#100908 100%)'
 
 function fmtDate(iso) {
@@ -12,8 +13,7 @@ function fmtDate(iso) {
 }
 
 function waHref(name, id) {
-  const msg = `Olá Lourenço! Quero preço para a obra "${name}" (ID: ${id}).`
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`
+  return waLink(`Olá Lourenço! Quero saber o preço da obra "${name}" (ID: ${id}).`)
 }
 
 // ── Tributes ──────────────────────────────────────────────────────────────────

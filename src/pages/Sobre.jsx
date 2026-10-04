@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
 import { TIMELINE } from '../data/content'
 import { ABOUT_PAGE } from '../data/ui'
+import { PageHero, CountUp } from '../components/ui'
+import { IconArrow } from '../components/icons'
 
 export default function Sobre() {
   const [imgRef, imgVisible] = useScrollReveal()
@@ -11,74 +13,52 @@ export default function Sobre() {
   const [statsRef, statsVisible] = useScrollReveal()
   const [ctaRef, ctaVisible] = useScrollReveal()
 
-  const { hero, bioImage, bioImageAlt, badge, paragraphs, stats, sectionLabels, pillars, cta } = ABOUT_PAGE
+  const { hero, bioImage, bioImageAlt, badge, paragraphs, stats, sectionLabels, sectionTitles, pillars, cta } = ABOUT_PAGE
 
   return (
     <>
-      {/* ── Page Hero ─────────────────────────────── */}
-      <div className="page-hero">
-        <div className="page-hero__breadcrumb">
-          <Link to="/">Início</Link>
-          <span> / {hero.breadcrumb}</span>
-        </div>
-        <h1 className="page-hero__title">
-          {hero.title.split('\n').map((line, i, arr) => (
-            <span key={i}>{line}{i < arr.length - 1 && <br/>}</span>
-          ))}
-        </h1>
-        <p className="page-hero__sub">{hero.subtitle}</p>
-        <div className="page-hero__deco" aria-hidden>{hero.deco}</div>
-      </div>
+      <PageHero {...hero} />
 
-      {/* ── Bio ───────────────────────────────────── */}
+      {/* ── Bio ── */}
       <section className="sobre-bio">
-        <div ref={imgRef} className={`sobre-bio__visual reveal-left${imgVisible ? ' visible' : ''}`}>
+        <div ref={imgRef} className={`sobre-bio__visual reveal${imgVisible ? ' visible' : ''}`}>
           <div className="about__img-frame">
-            <img
-              className="about__img"
-              src={bioImage}
-              alt={bioImageAlt}
-              loading="lazy"
-            />
+            <img className="about__img" src={bioImage} alt={bioImageAlt} loading="lazy" />
           </div>
           <div className="about__badge">
-            <span className="about__badge-num">{badge.num} </span>
+            <span className="about__badge-num">{badge.num}</span>
             <span className="about__badge-text">{badge.text}</span>
           </div>
         </div>
 
-        <div ref={textRef} className={`sobre-bio__text reveal-right${textVisible ? ' visible' : ''}`}>
+        <div ref={textRef} className={`sobre-bio__text reveal${textVisible ? ' visible' : ''}`}>
           <div className="section-label">{sectionLabels.bio}</div>
-          <h2 className="sobre-heading">Sobre o Artista</h2>
+          <h2 className="sobre-heading">{sectionTitles.heading}</h2>
           {paragraphs.map((p, i) => (
             <p key={i} className="sobre-body">{p}</p>
           ))}
         </div>
       </section>
 
-      {/* ── Stats ─────────────────────────────────── */}
+      {/* ── Números ── */}
       <div ref={statsRef} className={`sobre-stats reveal${statsVisible ? ' visible' : ''}`}>
         {stats.map(s => (
           <div key={s.label} className="sobre-stat">
-            <div className="sobre-stat__num">{s.num}</div>
+            <div className="sobre-stat__num"><CountUp value={s.num} start={statsVisible} /></div>
             <div className="sobre-stat__label">{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* ── Valores ───────────────────────────────── */}
+      {/* ── Especialidades ── */}
       <section className="sobre-values">
         <div ref={pillarsRef} className={`reveal${pillarsVisible ? ' visible' : ''}`}>
           <div className="section-label">{sectionLabels.values}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>VALORES</h2>
+          <h2 className="section-title-display section-title-display--spaced">{sectionTitles.values}</h2>
           <div className="sobre-values__grid">
             {pillars.map((p, i) => (
-              <div
-                key={p.title}
-                className="sobre-pillar"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <div className="sobre-pillar__icon">{p.icon}</div>
+              <div key={p.title} className="sobre-pillar">
+                <div className="sobre-pillar__icon">{String(i + 1).padStart(2, '0')}</div>
                 <div className="sobre-pillar__title">{p.title}</div>
                 <p className="sobre-pillar__desc">{p.desc}</p>
               </div>
@@ -87,23 +67,23 @@ export default function Sobre() {
         </div>
       </section>
 
-      {/* ── Timeline ──────────────────────────────── */}
+      {/* ── Percurso ── */}
       <section className="sobre-timeline-section">
         <div ref={timelineRef} className={`reveal${timelineVisible ? ' visible' : ''}`}>
           <div className="section-label">{sectionLabels.timeline}</div>
-          <h2 className="section-title-display" style={{ marginBottom: '56px' }}>HISTÓRIA</h2>
-          <div className="timeline">
+          <h2 className="section-title-display section-title-display--spaced">{sectionTitles.timeline}</h2>
+          <ol className="timeline">
             {TIMELINE.map(t => (
-              <div key={t.year} className="timeline__item">
+              <li key={t.year} className="timeline__item">
                 <div className="timeline__year">{t.year}</div>
                 <div className="timeline__event">{t.event}</div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────── */}
+      {/* ── CTA ── */}
       <section className="page-cta" ref={ctaRef}>
         <div className={`page-cta__inner reveal${ctaVisible ? ' visible' : ''}`}>
           <div className="section-label">{cta.label}</div>
@@ -111,10 +91,7 @@ export default function Sobre() {
           <p>{cta.description}</p>
           <div className="page-cta__btns">
             <Link to={cta.primary.to} className="btn-primary">
-              {cta.primary.label}
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" width="16" height="16">
-                <path d="M3 8h10M9 4l4 4-4 4"/>
-              </svg>
+              {cta.primary.label} <IconArrow size={15} />
             </Link>
             <Link to={cta.secondary.to} className="btn-outline">{cta.secondary.label}</Link>
           </div>

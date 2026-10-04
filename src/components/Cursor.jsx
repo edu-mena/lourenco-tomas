@@ -1,42 +1,52 @@
 import { useEffect, useRef } from 'react'
-import { useSprayCanvas } from '../hooks'
+import { useSprayCanvas, useMediaQuery } from '../hooks'
 
+const TEXT_FIELDS = 'input, textarea, select, [contenteditable="true"]'
+
+/* Cursor de pincel — só em dispositivos com rato; em ecrãs táteis não é montado */
 export default function Cursor() {
+  const finePointer = useMediaQuery('(hover: hover) and (pointer: fine)')
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('has-brush-cursor', finePointer)
+    return () => root.classList.remove('has-brush-cursor')
+  }, [finePointer])
+
+  return finePointer ? <BrushCursor /> : null
+}
+
+function BrushCursor() {
   const brushRef = useRef(null)
   const sprayCanvasRef = useSprayCanvas()
 
   useEffect(() => {
+    const el = brushRef.current
     const onMove = (e) => {
-      if (brushRef.current) {
-        brushRef.current.style.left = e.clientX + 'px'
-        brushRef.current.style.top = e.clientY + 'px'
-      }
+      el.style.transform = `translate3d(${e.clientX - 3}px, ${e.clientY - 3}px, 0)`
+      // Sobre campos de texto mostra-se o cursor nativo (I-beam)
+      el.classList.toggle('brush-cursor--hidden', !!e.target.closest?.(TEXT_FIELDS))
     }
+    const onDown = () => el.classList.add('brush-cursor--pressed')
+    const onUp = () => el.classList.remove('brush-cursor--pressed')
+    const onLeave = () => el.classList.add('brush-cursor--hidden')
+
     window.addEventListener('mousemove', onMove, { passive: true })
-    return () => window.removeEventListener('mousemove', onMove)
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('mouseup', onUp)
+    document.documentElement.addEventListener('mouseleave', onLeave)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mouseup', onUp)
+      document.documentElement.removeEventListener('mouseleave', onLeave)
+    }
   }, [])
 
   return (
     <>
-      <canvas
-        ref={sprayCanvasRef}
-        style={{
-          position: 'fixed', inset: 0,
-          width: '100%', height: '100%',
-          pointerEvents: 'none', zIndex: 9997,
-        }}
-      />
-      <div
-        ref={brushRef}
-        style={{
-          position: 'fixed',
-          zIndex: 9999,
-          pointerEvents: 'none',
-          transform: 'translate(-3px, -3px)',
-          left: '-200px',
-          top: '-200px',
-        }}
-      >
+      <canvas ref={sprayCanvasRef} className="spray-canvas" aria-hidden="true" />
+      <div ref={brushRef} className="brush-cursor brush-cursor--hidden" aria-hidden="true">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
           {/* Cerdas — 5 fios curvos que se abrem na ponta e convergem na virola */}
           <path d="M6 1 Q8 4 12 12" stroke="#bfaa88" strokeWidth="0.8" strokeLinecap="round"/>

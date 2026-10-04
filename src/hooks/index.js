@@ -1,125 +1,89 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-/* ── Scroll Reveal ──────────────────────────────── */
+/* ── Scroll Reveal ──────────────────────────────
+ * O elemento fica em estado (ref = setEl): funciona quando só aparece
+ * depois de carregar dados e sobrevive ao duplo-mount do StrictMode.
+ */
 export function useScrollReveal(options = {}) {
-  const ref = useRef(null)
+  const [el, setEl] = useState(null)
   const [visible, setVisible] = useState(false)
+  const optsRef = useRef(options)
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    if (!el || visible) return
+    if (typeof IntersectionObserver === 'undefined') { setVisible(true); return }
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          obs.unobserve(el)
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px', ...options }
+      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px', ...optsRef.current }
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [el, visible])
 
-  return [ref, visible]
+  return [setEl, visible]
 }
 
-/* ── Mouse Position ─────────────────────────────── */
-export function useMousePosition() {
-  const pos = useRef({ x: -200, y: -200 })
-  const ring = useRef({ x: -200, y: -200 })
-  const raf = useRef(null)
-
-  const dotRef = useRef(null)
-  const ringRef = useRef(null)
-
+/* ── Media query ────────────────────────────────── */
+export function useMediaQuery(query) {
+  const get = () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  const [matches, setMatches] = useState(get)
   useEffect(() => {
-    const onMove = (e) => {
-      pos.current = { x: e.clientX, y: e.clientY }
-      if (dotRef.current) {
-        dotRef.current.style.left = e.clientX + 'px'
-        dotRef.current.style.top = e.clientY + 'px'
-      }
-    }
-
-    const animate = () => {
-      ring.current.x += (pos.current.x - ring.current.x) * 0.12
-      ring.current.y += (pos.current.y - ring.current.y) * 0.12
-      if (ringRef.current) {
-        ringRef.current.style.left = ring.current.x + 'px'
-        ringRef.current.style.top = ring.current.y + 'px'
-      }
-      raf.current = requestAnimationFrame(animate)
-    }
-
-    window.addEventListener('mousemove', onMove, { passive: true })
-    raf.current = requestAnimationFrame(animate)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      cancelAnimationFrame(raf.current)
-    }
-  }, [])
-
-  const addHoverListeners = useCallback((el) => {
-    if (!el) return
-    const enter = () => document.body.classList.add('cursor--hover')
-    const leave = () => document.body.classList.remove('cursor--hover')
-    el.addEventListener('mouseenter', enter)
-    el.addEventListener('mouseleave', leave)
-    return () => {
-      el.removeEventListener('mouseenter', enter)
-      el.removeEventListener('mouseleave', leave)
-    }
-  }, [])
-
-  return { dotRef, ringRef, addHoverListeners }
+    const mq = window.matchMedia(query)
+    const on = () => setMatches(mq.matches)
+    on()
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [query])
+  return matches
 }
 
-/* ── Canvas Spray Particles ─────────────────────── */
+export const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/* ── Spray (assinatura da marca) ────────────────────
+ * Partículas só dentro de zonas [data-spray] (o hero) e numa rajada
+ * quando se clica num CTA. O loop de animação só corre enquanto há partículas.
+ */
 export function useSprayCanvas() {
   const canvasRef = useRef(null)
 
   useEffect(() => {
     const cv = canvasRef.current
-    if (!cv) return
+    if (!cv || prefersReducedMotion()) return
     const ctx = cv.getContext('2d')
-    let W = window.innerWidth
-    let H = window.innerHeight
-    cv.width = W; cv.height = H
-
-    const onResize = () => {
+    let W, H
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
       W = window.innerWidth; H = window.innerHeight
-      cv.width = W; cv.height = H
+      cv.width = W * dpr; cv.height = H * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
-    window.addEventListener('resize', onResize, { passive: true })
+    resize()
+    window.addEventListener('resize', resize, { passive: true })
 
     const particles = []
-    const COLORS = [
-      'rgba(214,194,168,', 'rgba(255,255,255,', 'rgba(184,149,106,',
-    ]
+    const COLORS = ['rgba(214,194,168,', 'rgba(255,255,255,', 'rgba(184,149,106,']
+    let raf = null
 
-    const onMove = (e) => {
-      if (Math.random() > 0.55) return
+    const emit = (x, y, count, force) => {
       const c = COLORS[Math.floor(Math.random() * COLORS.length)]
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2
-        const speed = Math.random() * 1.5 + 0.2
+        const speed = (Math.random() * 1.5 + 0.2) * force
         particles.push({
-          x: e.clientX, y: e.clientY,
+          x, y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 0.4,
           r: Math.random() * 2.4 + 0.4,
           a: Math.random() * 0.35 + 0.08,
-          color: c,
-          life: 1,
+          color: c, life: 1,
           decay: 0.022 + Math.random() * 0.03,
         })
       }
-      if (particles.length > 220) particles.splice(0, 25)
+      if (particles.length > 260) particles.splice(0, particles.length - 260)
+      if (!raf) raf = requestAnimationFrame(draw)
     }
-    window.addEventListener('mousemove', onMove, { passive: true })
 
-    let raf
     const draw = () => {
       ctx.clearRect(0, 0, W, H)
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -132,13 +96,23 @@ export function useSprayCanvas() {
         ctx.fillStyle = p.color + (p.a * p.life) + ')'
         ctx.fill()
       }
-      raf = requestAnimationFrame(draw)
+      raf = particles.length ? requestAnimationFrame(draw) : null
     }
-    draw()
+
+    const onMove = (e) => {
+      if (Math.random() > 0.55 || !e.target.closest?.('[data-spray]')) return
+      emit(e.clientX, e.clientY, 3, 1)
+    }
+    const onClick = (e) => {
+      if (e.target.closest?.('.btn-primary, .form-submit, .nav__cta')) emit(e.clientX, e.clientY, 36, 2.2)
+    }
+    window.addEventListener('mousemove', onMove, { passive: true })
+    window.addEventListener('click', onClick)
 
     return () => {
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', resize)
       window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('click', onClick)
       cancelAnimationFrame(raf)
     }
   }, [])
