@@ -87,7 +87,6 @@ export default function Contacto() {
 
           {/* ── Canais ── */}
           <div ref={leftRef} className={`reveal${leftVisible ? ' visible' : ''}`}>
-            <div className="section-label">{channels.heading}</div>
             <h2 className="contacto-heading">{channels.title}</h2>
             <p className="contacto-desc">{channels.body}</p>
             <ul className="contacto-cards">
@@ -112,7 +111,6 @@ export default function Contacto() {
 
           {/* ── Formulário ── */}
           <div ref={rightRef} className={`reveal${rightVisible ? ' visible' : ''}`} style={{ transitionDelay: '0.1s' }} data-hide-wa>
-            <div className="section-label">{form.intro}</div>
             <h2 className="contacto-heading contacto-heading--form">{form.titles}</h2>
 
             {sent ? (

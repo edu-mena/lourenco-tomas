@@ -37,6 +37,38 @@ export function useMediaQuery(query) {
   return matches
 }
 
+/* ── Carril horizontal ──────────────────────────────
+ * Diz se há conteúdo escondido à esquerda/direita e desliza um "ecrã" de cada vez.
+ */
+export function useHScroll() {
+  const [el, setEl] = useState(null)
+  const [edges, setEdges] = useState({ prev: false, next: false })
+
+  useEffect(() => {
+    if (!el) return
+    const update = () => setEdges({
+      prev: el.scrollLeft > 4,
+      next: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+    })
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => { el.removeEventListener('scroll', update); ro.disconnect() }
+  }, [el])
+
+  const scroll = dir => el?.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' })
+  return { ref: setEl, ...edges, scroll }
+}
+
+/* ── Título do separador ────────────────────────── */
+const BASE_TITLE = 'Lourenço Tomás — Aerografia'
+export function usePageTitle(title) {
+  useEffect(() => {
+    document.title = title ? `${title} — Lourenço Tomás` : BASE_TITLE
+  }, [title])
+}
+
 export const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 

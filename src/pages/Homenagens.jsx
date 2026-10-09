@@ -152,7 +152,6 @@ export default function Homenagens() {
         className={`hom-cta reveal${ctaVisible ? ' visible' : ''}`}
       >
         <div className="hom-cta__inner">
-          <div className="section-label">{TRIBUTES_PAGE.cta.label}</div>
           <h2 className="hom-cta__title">{TRIBUTES_PAGE.cta.title}<br /><span>{TRIBUTES_PAGE.cta.titleAccent}</span></h2>
           <p className="hom-cta__desc">{TRIBUTES_PAGE.cta.description}</p>
           <a href={TRIBUTES_PAGE.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">

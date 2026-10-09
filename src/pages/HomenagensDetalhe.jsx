@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useTributeBySlug } from '../hooks/useApi'
 import { useModal, useSwipe } from '../hooks/useModal'
+import { usePageTitle } from '../hooks'
 import { TRIBUTE_DETAIL_PAGE } from '../data/ui'
 import { IconClose } from '../components/icons'
 
@@ -145,6 +146,7 @@ export default function HomenagensDetalhe() {
   const { slug } = useParams()
   const { tribute, allTributes, loading, error } = useTributeBySlug(slug)
   const [lightboxIdx, setLightboxIdx] = useState(null)
+  usePageTitle(tribute ? `Homenagem a ${tribute.celebrity.name}` : 'Homenagens')
 
   if (loading) {
     return (
@@ -209,7 +211,6 @@ export default function HomenagensDetalhe() {
         {/* Intro */}
         <section className="hdet-intro">
           <div className="hdet-intro__lead">
-            <div className="section-label">{TRIBUTE_DETAIL_PAGE.sectionLabel}</div>
             <h2 className="hdet-intro__title">{tribute.work.title}</h2>
           </div>
           <div className="hdet-intro__body">
@@ -285,7 +286,6 @@ export default function HomenagensDetalhe() {
         {/* CTA Instagram */}
         <section className="hdet-ig-cta">
           <div className="hdet-ig-cta__inner">
-            <div className="section-label">{TRIBUTE_DETAIL_PAGE.cta.label}</div>
             <h2 className="hdet-ig-cta__title">Veja o processo<br /><span>no Instagram</span></h2>
             <p className="hdet-ig-cta__desc">{TRIBUTE_DETAIL_PAGE.cta.description}</p>
             <a

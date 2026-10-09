@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { prefersReducedMotion } from '../hooks'
+import { prefersReducedMotion, usePageTitle } from '../hooks'
 import { IconCopy, IconCheck, IconWhatsApp, IconEmail } from './icons'
 
 /* ── Page Hero ──────────────────────────────────── */
 export function PageHero({ breadcrumb, title, subtitle }) {
+  usePageTitle(breadcrumb)
   return (
     <header className="page-hero">
       <nav className="page-hero__breadcrumb" aria-label="Localização">

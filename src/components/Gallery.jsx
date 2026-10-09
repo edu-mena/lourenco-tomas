@@ -21,7 +21,6 @@ export default function Gallery() {
     <section id="gallery" className="gallery-section" aria-labelledby="gallery-title">
       <div ref={headerRef} className={`gallery-section__header reveal${headerVisible ? ' visible' : ''}`}>
         <div>
-          <div className="section-label">{GALLERY_SECTION.label}</div>
           <h2 id="gallery-title" className="section-title-display">{GALLERY_SECTION.title}</h2>
           <p className="gallery-section__sub">{GALLERY_SECTION.sub}</p>
         </div>

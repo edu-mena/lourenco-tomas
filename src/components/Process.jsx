@@ -1,9 +1,13 @@
-import { useState, useRef } from 'react'
-import { useScrollReveal, useMediaQuery } from '../hooks'
+import { useState, useRef, useCallback } from 'react'
+import { useScrollReveal, useMediaQuery, useHScroll } from '../hooks'
 import { useVideos } from '../hooks/useApi'
 import { useModal } from '../hooks/useModal'
 import { PROCESS_SECTION } from '../data/ui'
-import { IconClose, IconPlay } from './icons'
+import { IconClose, IconPlay, IconChevron } from './icons'
+
+/* Os vídeos são reels verticais: a miniatura usa um fotograma a meio segundo
+   (o primeiro costuma ser preto) */
+const THUMB_T = 0.5
 
 function VideoCard({ video, onOpen, canPreview }) {
   const ref = useRef(null)
@@ -12,19 +16,19 @@ function VideoCard({ video, onOpen, canPreview }) {
     const v = ref.current
     if (!canPreview || !v) return
     if (play) v.play().catch(() => {})
-    else { v.pause(); v.currentTime = 0 }
+    else { v.pause(); v.currentTime = THUMB_T }
   }
 
   return (
     <button
       type="button"
-      className={`video-card${video.featured ? ' video-card--featured' : ''}`}
+      className="video-card"
       onClick={() => onOpen(video)}
       onMouseEnter={() => preview(true)}
       onMouseLeave={() => preview(false)}
       aria-label={`Ver vídeo: ${video.title}`}
     >
-      <video ref={ref} className="video-card__thumb" preload="metadata" muted loop playsInline src={video.src} tabIndex={-1} />
+      <video ref={ref} className="video-card__thumb" preload="metadata" muted loop playsInline src={`${video.src}#t=${THUMB_T}`} tabIndex={-1} />
       <span className="video-card__play" aria-hidden="true"><span className="video-card__play-icon"><IconPlay size={18} /></span></span>
       <span className="video-card__info">
         {video.label && <span className="video-card__label">{video.label}</span>}
@@ -52,6 +56,8 @@ function VideoModal({ video, onClose }) {
 export default function Process() {
   const [headerRef, headerVisible] = useScrollReveal()
   const [gridRef, gridVisible] = useScrollReveal()
+  const rail = useHScroll()
+  const setGrid = useCallback(el => { gridRef(el); rail.ref(el) }, [gridRef, rail.ref])
   const [selectedVideo, setSelectedVideo] = useState(null)
   const canPreview = useMediaQuery('(hover: hover) and (pointer: fine)')
   const { videos: rawVideos } = useVideos()
@@ -64,13 +70,24 @@ export default function Process() {
       <div className="process__inner">
         <div ref={headerRef} className={`process__header reveal${headerVisible ? ' visible' : ''}`}>
           <div>
-            <div className="section-label">{PROCESS_SECTION.label}</div>
             <h2 id="process-title" className="section-title-display">{PROCESS_SECTION.title}</h2>
           </div>
-          <p className="process__intro">{PROCESS_SECTION.intro}</p>
+          <div className="process__aside">
+            <p className="process__intro">{PROCESS_SECTION.intro}</p>
+            {(rail.prev || rail.next) && (
+              <div className="rail-nav">
+                <button type="button" className="rail-nav__btn" onClick={() => rail.scroll(-1)} disabled={!rail.prev} aria-label="Vídeos anteriores">
+                  <IconChevron size={18} dir="left" />
+                </button>
+                <button type="button" className="rail-nav__btn" onClick={() => rail.scroll(1)} disabled={!rail.next} aria-label="Vídeos seguintes">
+                  <IconChevron size={18} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div ref={gridRef} className={`process__grid reveal${gridVisible ? ' visible' : ''}`}>
+        <div ref={setGrid} className={`process__grid reveal${gridVisible ? ' visible' : ''}`}>
           {videos.map(v => (
             <VideoCard key={v.id} video={v} onOpen={setSelectedVideo} canPreview={canPreview} />
           ))}

@@ -14,7 +14,6 @@ export default function Contact() {
     <section id="contact" className="contact" aria-labelledby="contact-title">
       <div className="contact__grid">
         <div ref={leftRef} className={`contact__left reveal${leftVisible ? ' visible' : ''}`}>
-          <div className="section-label">{CONTACT_SECTION.heading}</div>
           <h2 id="contact-title" className="contact__heading">{CONTACT_SECTION.title}</h2>
           <p className="contact__desc">{CONTACT_SECTION.body}</p>
           <div className="contact__actions">

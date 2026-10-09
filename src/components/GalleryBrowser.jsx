@@ -20,6 +20,12 @@ export function GalleryFilters({ items, filter, onChange }) {
       if (btn) setPill({ x: btn.offsetLeft, y: btn.offsetTop, w: btn.offsetWidth, h: btn.offsetHeight })
     }
     measure()
+    // No telemóvel os filtros deslizam numa só linha: mantém o activo à vista
+    const wrap = wrapRef.current
+    const btn = wrap?.querySelector('[aria-pressed="true"]')
+    if (btn && wrap.scrollWidth > wrap.clientWidth) {
+      wrap.scrollTo({ left: btn.offsetLeft - (wrap.clientWidth - btn.offsetWidth) / 2, behavior: 'smooth' })
+    }
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
   }, [filter, filters.length])
@@ -45,13 +51,36 @@ export function GalleryFilters({ items, filter, onChange }) {
   )
 }
 
+/* Masonry em CSS grid: cada obra ocupa tantas linhas de ROW_UNIT px quanto a sua
+ * altura. Ao contrário de `columns`, preenche linha a linha (sem buracos no topo)
+ * e mantém a ordem do DOM — a navegação por teclado segue a ordem visual. */
+const ROW_UNIT = 2
+const GAP = 14
+
+function useMasonrySpan() {
+  const ref = useRef(null)
+  useLayoutEffect(() => {
+    const item = ref.current
+    const art = item?.firstElementChild
+    if (!art) return
+    const fit = () => item.style.setProperty('--span', Math.ceil((art.offsetHeight + GAP) / ROW_UNIT))
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(art)
+    return () => ro.disconnect()
+  }, [])
+  return ref
+}
+
 /* ── Item da galeria — mostra a obra real, com fade ao carregar ── */
 export function GalleryItem({ item, index, onOpen }) {
   const [loaded, setLoaded] = useState(false)
+  const ref = useMasonrySpan()
   const label = item.name || item.title
 
   return (
     <button
+      ref={ref}
       type="button"
       className={`gallery__item${loaded || !item.img ? ' is-loaded' : ''}`}
       style={{ '--i': Math.min(index, 10) }}

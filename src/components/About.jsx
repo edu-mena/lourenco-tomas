@@ -39,7 +39,6 @@ export default function About() {
       </div>
 
       <div ref={textRef} className={`about__text reveal-right${textVisible ? ' visible' : ''}`}>
-        <div className="section-label">{ABOUT_SECTION.label}</div>
         <h2 id="about-title" className="about__heading">{ABOUT_SECTION.heading}</h2>
         <p className="about__body">{ABOUT_SECTION.body[0]}</p>
         <Link to="/sobre" className="link-arrow about__more">

@@ -42,7 +42,7 @@ export const SERVICE_OPTIONS = [
 export const HERO_CONTENT = {
   image: mediaUrl('/images/hero/hero.jpeg'),
   imageAlt: 'Lourenço Tomás no ateliê',
-  title: ['Lourenço', 'Tomás'],
+  title: ['Aerografia,', 'Arte Viva'],
   ctaPrimary: 'Ver obras',
   ctaSecondary: 'Encomendar',
   scrollLabel: 'Continuar',
@@ -97,8 +97,9 @@ export const FOOTER_CONTENT = {
   waTooltip: 'Falar no WhatsApp',
   links: [
     { to: '/obras', label: 'Obras' },
-    { to: '/encomendas', label: 'Encomendas' },
+    { to: '/corporativos', label: 'Corporativo' },
     { to: '/homenagens', label: 'Homenagens' },
+    { to: '/encomendas', label: 'Encomendas' },
     { to: '/blog', label: 'Blog' },
     { to: '/sobre', label: 'Sobre' },
     { to: '/contacto', label: 'Contacto' },

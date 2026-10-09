@@ -314,7 +314,6 @@ export default function Corporativos() {
       {/* ── Process Steps ── */}
       <section ref={procRef} className={`corp2-process reveal${procVisible ? ' visible' : ''}`}>
         <div className="corp2-process__inner">
-          <div className="section-label">{CORPORATE_PAGE.sectionLabels.process}</div>
           <h2 className="corp2-process__title">
             {CORPORATE_PAGE.processTitle.first}<br /><em>{CORPORATE_PAGE.processTitle.second}</em>
           </h2>
@@ -352,7 +351,6 @@ export default function Corporativos() {
       {/* ── CTA ── */}
       <section ref={ctaRef} className={`hom-cta reveal${ctaVisible ? ' visible' : ''}`}>
         <div className="hom-cta__inner">
-          <div className="section-label">{CORPORATE_PAGE.sectionLabels.cta}</div>
           <h2 className="hom-cta__title">
             {CORPORATE_PAGE.cta.title[0]}<br /><span>{CORPORATE_PAGE.cta.title[1]}</span>
           </h2>
@@ -470,7 +468,6 @@ export default function Corporativos() {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 1px;
-          background: rgba(214,194,168,0.07);
         }
         .corp2-card {
           background: var(--ink);
@@ -755,14 +752,14 @@ export default function Corporativos() {
         }
         .corp2-process__inner { max-width: var(--max-w); margin: 0 auto; }
         .corp2-process__title {
-          font-family: var(--ff-serif);
+          font-family: var(--ff-accent);
           font-size: clamp(2rem, 4vw, 3.5rem);
           font-weight: 900;
           color: var(--white);
           line-height: 1.1;
           margin: 12px 0 56px;
         }
-        .corp2-process__title em { font-style: italic; color: var(--beige); }
+        .corp2-process__title em { font-style: normal; color: var(--beige); }
         .corp2-process__grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);

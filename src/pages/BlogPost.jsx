@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useScrollReveal } from '../hooks'
+import { useScrollReveal, usePageTitle } from '../hooks'
 import { usePostBySlug, usePosts } from '../hooks/useApi'
 import { BLOG_POST_PAGE } from '../data/ui'
 import { IconArrow } from '../components/icons'
@@ -39,6 +39,7 @@ export default function BlogPost() {
   const [articleRef, articleVisible] = useScrollReveal()
   const [relatedRef, relatedVisible] = useScrollReveal()
   const bodyRef = useRef(null)
+  usePageTitle(post?.title ?? 'Blog')
 
   if (loading) {
     return (
@@ -105,7 +106,6 @@ export default function BlogPost() {
 
         {/* Commission CTA */}
         <div className="bpost-cta">
-          <p className="bpost-cta__label">{BLOG_POST_PAGE.cta.label}</p>
           <h2 className="bpost-cta__title">{BLOG_POST_PAGE.cta.title}</h2>
           <p className="bpost-cta__desc">
             {BLOG_POST_PAGE.cta.description}
@@ -121,7 +121,6 @@ export default function BlogPost() {
           className={`bpost-related reveal${relatedVisible ? ' visible' : ''}`}
         >
           <div className="bpost-related__header">
-            <div className="section-label">{BLOG_POST_PAGE.relatedSectionLabel}</div>
             <h2 className="bpost-related__title">{BLOG_POST_PAGE.relatedTitle}</h2>
           </div>
           <div className="bpost-related__grid">

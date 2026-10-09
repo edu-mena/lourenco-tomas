@@ -1,6 +1,7 @@
 import { WA_DEFAULT_MESSAGE, INSTAGRAM_URL, INSTAGRAM_HANDLE, WA_DISPLAY, LOCATION_URL, LOCATION_LABEL } from '../data/content'
 import { ABOUT_PAGE, LINKS_PAGE } from '../data/ui'
 import { waLink } from '../lib/whatsapp'
+import { usePageTitle } from '../hooks'
 import { IconWhatsApp, IconInstagram, IconPin } from '../components/icons'
 
 /*
@@ -14,6 +15,7 @@ const LINKS = [
 ]
 
 export default function Contactos() {
+  usePageTitle('Contactos')
   return (
     <main className="links-page">
       <img className="links-page__photo" src={ABOUT_PAGE.bioImage} alt={ABOUT_PAGE.bioImageAlt} />

@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 import { IconArrow } from '../components/icons'
+import { usePageTitle } from '../hooks'
 
 export default function NotFound() {
+  usePageTitle('Página não encontrada')
   return (
     <section className="not-found">
-      <p className="section-label">Erro 404</p>
       <h1 className="not-found__title">Esta página não existe</h1>
       <p className="not-found__desc">O link pode estar errado ou a página foi movida.</p>
       <div className="not-found__actions">

@@ -2,8 +2,10 @@ import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { HERO_CONTENT } from '../data/ui'
 import { IconArrow } from './icons'
+import { usePageTitle } from '../hooks'
 
 export default function Hero() {
+  usePageTitle(null)
   const scrollToGallery = () => {
     document.querySelector('#gallery')?.scrollIntoView({ behavior: 'smooth' })
   }

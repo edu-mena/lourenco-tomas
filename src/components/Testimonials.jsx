@@ -8,14 +8,17 @@ export default function Testimonials() {
 
   if (!testimonials.length) return null
 
+  // Sem cartões órfãos: 4 testemunhos ficam em 2×2, não em 3 + 1
+  const n = testimonials.length
+  const cols = n <= 2 ? n : n === 4 ? 2 : 3
+
   return (
     <section id="testimonials" className="testimonials" aria-labelledby="testimonials-title">
       <div ref={headerRef} className={`testimonials__header reveal${headerVisible ? ' visible' : ''}`}>
-        <div className="section-label">{TESTIMONIALS_SECTION.label}</div>
         <h2 id="testimonials-title" className="section-title-display">{TESTIMONIALS_SECTION.title}</h2>
       </div>
 
-      <div className="testimonials__grid">
+      <div className="testimonials__grid" data-cols={cols}>
         {testimonials.map((t, i) => (
           <TestimonialCard key={t.id} item={t} delay={i * 0.1} />
         ))}

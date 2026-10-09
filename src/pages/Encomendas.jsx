@@ -100,7 +100,6 @@ export default function Encomendas() {
       {/* ── Serviços — cada cartão leva ao formulário com o serviço escolhido ── */}
       <section className="services-section">
         <div ref={servicesRef} className={`reveal${servicesVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.services}</div>
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.services}</h2>
           <div className="services-grid">
             {services.map(s => (
@@ -124,7 +123,6 @@ export default function Encomendas() {
       {/* ── Como funciona ── */}
       <section className="order-process">
         <div ref={stepsRef} className={`reveal${stepsVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.process}</div>
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.process}</h2>
           <ol className="order-process__grid">
             {steps.map(s => (
@@ -142,7 +140,6 @@ export default function Encomendas() {
       <section id="formulario" className="encomendas-form-section" data-hide-wa>
         <div className="encomendas-layout">
           <div className="encomendas-form-inner">
-            <div className="section-label">{sectionLabels.form}</div>
             <h2 className="section-title-display section-title-display--spaced">{sectionTitles.form}</h2>
 
             {sentMsg ? (

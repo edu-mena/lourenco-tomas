@@ -13,7 +13,7 @@ export default function Sobre() {
   const [statsRef, statsVisible] = useScrollReveal()
   const [ctaRef, ctaVisible] = useScrollReveal()
 
-  const { hero, bioImage, bioImageAlt, badge, paragraphs, stats, sectionLabels, sectionTitles, pillars, cta } = ABOUT_PAGE
+  const { hero, bioImage, bioImageAlt, badge, paragraphs, stats, sectionTitles, pillars, cta } = ABOUT_PAGE
 
   return (
     <>
@@ -25,14 +25,15 @@ export default function Sobre() {
           <div className="about__img-frame">
             <img className="about__img" src={bioImage} alt={bioImageAlt} loading="lazy" />
           </div>
-          <div className="about__badge">
-            <span className="about__badge-num">{badge.num}</span>
-            <span className="about__badge-text">{badge.text}</span>
-          </div>
+          {badge?.num && (
+            <div className="about__badge">
+              <span className="about__badge-num">{badge.num}</span>
+              <span className="about__badge-text">{badge.text}</span>
+            </div>
+          )}
         </div>
 
         <div ref={textRef} className={`sobre-bio__text reveal${textVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.bio}</div>
           <h2 className="sobre-heading">{sectionTitles.heading}</h2>
           {paragraphs.map((p, i) => (
             <p key={i} className="sobre-body">{p}</p>
@@ -53,7 +54,6 @@ export default function Sobre() {
       {/* ── Especialidades ── */}
       <section className="sobre-values">
         <div ref={pillarsRef} className={`reveal${pillarsVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.values}</div>
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.values}</h2>
           <div className="sobre-values__grid">
             {pillars.map((p, i) => (
@@ -70,7 +70,6 @@ export default function Sobre() {
       {/* ── Percurso ── */}
       <section className="sobre-timeline-section">
         <div ref={timelineRef} className={`reveal${timelineVisible ? ' visible' : ''}`}>
-          <div className="section-label">{sectionLabels.timeline}</div>
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.timeline}</h2>
           <ol className="timeline">
             {TIMELINE.map(t => (
@@ -86,7 +85,6 @@ export default function Sobre() {
       {/* ── CTA ── */}
       <section className="page-cta" ref={ctaRef}>
         <div className={`page-cta__inner reveal${ctaVisible ? ' visible' : ''}`}>
-          <div className="section-label">{cta.label}</div>
           <h2 className="page-cta__title">{cta.title}</h2>
           <p>{cta.description}</p>
           <div className="page-cta__btns">
