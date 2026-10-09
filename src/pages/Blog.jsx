@@ -5,6 +5,7 @@ import { usePosts } from '../hooks/useApi'
 import { BLOG_PAGE } from '../data/ui'
 import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
 import { IconArrow } from '../components/icons'
+import { useSiteContent } from '../content/SiteContent'
 
 export default function Blog() {
   const [filter, setFilter] = useState('Todos')
@@ -12,14 +13,16 @@ export default function Blog() {
   const [gridRef, gridVisible] = useScrollReveal()
 
   const { posts, loading, error, reload } = usePosts()
+  const { general } = useSiteContent()
 
   const filtered = filter === 'Todos' ? posts : posts.filter(p => p.cat === filter)
-  const featured = filtered[0] ?? null
-  const rest = filtered.slice(1)
+  // O artigo marcado como destaque no admin; sem nenhum, o mais recente
+  const featured = filtered.find(p => p.featured) ?? filtered[0] ?? null
+  const rest = filtered.filter(p => p !== featured)
 
   return (
     <>
-      <PageHero {...BLOG_PAGE.hero} />
+      <PageHero {...BLOG_PAGE.hero} subtitle={general.blogSubtitle} />
 
       {/* Filter bar */}
       <div className="blog-filters-wrap">

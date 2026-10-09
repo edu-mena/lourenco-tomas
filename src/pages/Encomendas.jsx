@@ -6,6 +6,7 @@ import { ORDER_PAGE, SERVICE_OPTIONS } from '../data/ui'
 import { buildMessage, openWhatsApp, waLink, mailLink } from '../lib/whatsapp'
 import { PageHero, Field, SentPanel } from '../components/ui'
 import { IconArrow, IconWhatsApp } from '../components/icons'
+import { useSiteContent } from '../content/SiteContent'
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false)
@@ -42,7 +43,12 @@ export default function Encomendas() {
   const [stepsRef, stepsVisible] = useScrollReveal()
   const [sentMsg, setSentMsg] = useState(null)
 
-  const { hero, sectionLabels, sectionTitles, services, steps, faqs, form } = ORDER_PAGE
+  const { hero, sectionLabels, sectionTitles, form } = ORDER_PAGE
+  const { orders } = useSiteContent()
+  // Os quatro serviços têm valor fixo (liga ao campo "Tipo de obra"); textos, preços e imagens vêm do admin
+  const services = ORDER_PAGE.services.map(s => ({ ...s, ...orders.services.find(x => x.key === s.key) }))
+  const steps = orders.steps.map((s, i) => ({ ...s, num: String(i + 1).padStart(2, '0') }))
+  const faqs = orders.faqs
   const f = form.fields
 
   // Pré-preenchido a partir da galeria: /encomendas?servico=tela&ref=Nome
@@ -95,7 +101,7 @@ export default function Encomendas() {
 
   return (
     <>
-      <PageHero {...hero} />
+      <PageHero {...hero} subtitle={orders.subtitle} />
 
       {/* ── Serviços — cada cartão leva ao formulário com o serviço escolhido ── */}
       <section className="services-section">
@@ -103,13 +109,13 @@ export default function Encomendas() {
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.services}</h2>
           <div className="services-grid">
             {services.map(s => (
-              <article key={s.title} className="service-card">
+              <article key={s.key} className="service-card">
                 <div className="service-card__img"><img src={s.img} alt="" loading="lazy" /></div>
                 <h3 className="service-card__title">{s.title}</h3>
                 <p className="service-card__desc">{s.desc}</p>
                 <div className="service-card__price">{s.price}</div>
                 <ul className="service-card__includes">
-                  {s.includes.map(item => <li key={item}>{item}</li>)}
+                  {s.includes.map((item, i) => <li key={i}>{item}</li>)}
                 </ul>
                 <button type="button" className="service-card__cta" onClick={() => chooseService(s.value)}>
                   {ORDER_PAGE.serviceCta} {s.title.toLowerCase()} <IconArrow size={13} />
@@ -186,7 +192,7 @@ export default function Encomendas() {
                   <button type="submit" className="form-submit">
                     <IconWhatsApp size={16} /> {form.submit}
                   </button>
-                  <p className="form-note">{form.note}</p>
+                  <p className="form-note">{orders.note}</p>
                 </div>
               </form>
             )}
@@ -195,7 +201,7 @@ export default function Encomendas() {
           <aside className="faq-aside" aria-labelledby="faq-title">
             <h2 id="faq-title" className="faq-aside__title">{sectionLabels.faq}</h2>
             <div className="faq-list">
-              {faqs.map(q => <FaqItem key={q.q} {...q} />)}
+              {faqs.map((q, i) => <FaqItem key={i} {...q} />)}
             </div>
           </aside>
         </div>

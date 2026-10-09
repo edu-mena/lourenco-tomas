@@ -6,6 +6,7 @@ import { CORPORATE_PAGE } from '../data/ui'
 import { useCompanies } from '../hooks/useApi'
 import { waLink } from '../lib/whatsapp'
 import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
+import { useSiteContent } from '../content/SiteContent'
 
 // ─── Icons ──────────────────────────────────────────────────────
 
@@ -169,6 +170,7 @@ export default function Corporativos() {
   const [ctaRef,     ctaVisible]     = useScrollReveal()
 
   const { companies: COMPANIES, loading, error, reload } = useCompanies()
+  const { general } = useSiteContent()
 
   const allWorks = COMPANIES.flatMap(c =>
     c.works.map(w => ({ ...w, companyName: c.name, companySlug: c.slug }))
@@ -207,7 +209,7 @@ export default function Corporativos() {
         <Lightbox image={lightboxWork} onClose={() => setLightboxWork(null)} />
       )}
 
-      <PageHero {...CORPORATE_PAGE.hero} />
+      <PageHero {...CORPORATE_PAGE.hero} subtitle={general.corporateSubtitle} />
 
       {loading && <section className="corp2-section"><SkeletonGrid count={3} variant="cards" /></section>}
       {error && <ErrorState message="Não foi possível carregar os projectos." onRetry={reload} />}

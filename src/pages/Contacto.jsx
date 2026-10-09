@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { useScrollReveal } from '../hooks'
 import { useForm, rules } from '../hooks/useForm'
-import { SOCIAL_LINKS } from '../data/content'
 import { CONTACTO_PAGE } from '../data/ui'
 import { buildMessage, openWhatsApp, waLink, mailLink } from '../lib/whatsapp'
 import { PageHero, Field, SentPanel, CopyButton } from '../components/ui'
 import { IconArrow, IconWhatsApp, IconEmail, SOCIAL_ICONS } from '../components/icons'
+import { useSiteContent, socialLinks } from '../content/SiteContent'
 
 // ─── Ícones dos cartões de informação ───────────────────────────
 
@@ -57,7 +57,10 @@ export default function Contacto() {
   const [rightRef, rightVisible] = useScrollReveal()
   const [featRef, featVisible] = useScrollReveal()
 
-  const { hero, channels, form, infoCards } = CONTACTO_PAGE
+  const { hero, form } = CONTACTO_PAGE
+  const { contact: channels } = useSiteContent()
+  // Os ícones dos cartões são fixos por posição; etiquetas e valores vêm do admin
+  const infoCards = CONTACTO_PAGE.infoCards.map((card, i) => ({ ...card, ...channels.infoCards[i] }))
   const f = form.fields
 
   const contact = useForm({
@@ -80,17 +83,17 @@ export default function Contacto() {
 
   return (
     <>
-      <PageHero {...hero} />
+      <PageHero {...hero} subtitle={channels.pageSubtitle} />
 
       <section className="contacto-page">
         <div className="contacto-grid">
 
           {/* ── Canais ── */}
           <div ref={leftRef} className={`reveal${leftVisible ? ' visible' : ''}`}>
-            <h2 className="contacto-heading">{channels.title}</h2>
-            <p className="contacto-desc">{channels.body}</p>
+            <h2 className="contacto-heading">{channels.channelsTitle}</h2>
+            <p className="contacto-desc">{channels.channelsBody}</p>
             <ul className="contacto-cards">
-              {SOCIAL_LINKS.map(s => {
+              {socialLinks(channels).map(s => {
                 const Icon = SOCIAL_ICONS[s.icon]
                 return (
                   <li key={s.id} className="contacto-card-wrap">

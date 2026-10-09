@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useScrollReveal } from '../hooks'
-import { TIMELINE } from '../data/content'
 import { ABOUT_PAGE } from '../data/ui'
 import { PageHero, CountUp } from '../components/ui'
 import { IconArrow } from '../components/icons'
+import { useSiteContent } from '../content/SiteContent'
 
 export default function Sobre() {
   const [imgRef, imgVisible] = useScrollReveal()
@@ -13,11 +13,13 @@ export default function Sobre() {
   const [statsRef, statsVisible] = useScrollReveal()
   const [ctaRef, ctaVisible] = useScrollReveal()
 
-  const { hero, bioImage, bioImageAlt, badge, paragraphs, stats, sectionTitles, pillars, cta } = ABOUT_PAGE
+  const { sectionTitles, cta } = ABOUT_PAGE
+  const { aboutPage: page } = useSiteContent()
+  const { bioImage, bioImageAlt, badge, paragraphs, stats, pillars } = page
 
   return (
     <>
-      <PageHero {...hero} />
+      <PageHero breadcrumb={ABOUT_PAGE.hero.breadcrumb} title={page.title} subtitle={page.subtitle} />
 
       {/* ── Bio ── */}
       <section className="sobre-bio">
@@ -34,7 +36,7 @@ export default function Sobre() {
         </div>
 
         <div ref={textRef} className={`sobre-bio__text reveal${textVisible ? ' visible' : ''}`}>
-          <h2 className="sobre-heading">{sectionTitles.heading}</h2>
+          <h2 className="sobre-heading">{page.heading}</h2>
           {paragraphs.map((p, i) => (
             <p key={i} className="sobre-body">{p}</p>
           ))}
@@ -43,8 +45,8 @@ export default function Sobre() {
 
       {/* ── Números ── */}
       <div ref={statsRef} className={`sobre-stats reveal${statsVisible ? ' visible' : ''}`}>
-        {stats.map(s => (
-          <div key={s.label} className="sobre-stat">
+        {stats.map((s, i) => (
+          <div key={i} className="sobre-stat">
             <div className="sobre-stat__num"><CountUp value={s.num} start={statsVisible} /></div>
             <div className="sobre-stat__label">{s.label}</div>
           </div>
@@ -57,7 +59,7 @@ export default function Sobre() {
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.values}</h2>
           <div className="sobre-values__grid">
             {pillars.map((p, i) => (
-              <div key={p.title} className="sobre-pillar">
+              <div key={i} className="sobre-pillar">
                 <div className="sobre-pillar__icon">{String(i + 1).padStart(2, '0')}</div>
                 <div className="sobre-pillar__title">{p.title}</div>
                 <p className="sobre-pillar__desc">{p.desc}</p>
@@ -72,8 +74,8 @@ export default function Sobre() {
         <div ref={timelineRef} className={`reveal${timelineVisible ? ' visible' : ''}`}>
           <h2 className="section-title-display section-title-display--spaced">{sectionTitles.timeline}</h2>
           <ol className="timeline">
-            {TIMELINE.map(t => (
-              <li key={t.year} className="timeline__item">
+            {page.timeline.map((t, i) => (
+              <li key={i} className="timeline__item">
                 <div className="timeline__year">{t.year}</div>
                 <div className="timeline__event">{t.event}</div>
               </li>
@@ -85,8 +87,8 @@ export default function Sobre() {
       {/* ── CTA ── */}
       <section className="page-cta" ref={ctaRef}>
         <div className={`page-cta__inner reveal${ctaVisible ? ' visible' : ''}`}>
-          <h2 className="page-cta__title">{cta.title}</h2>
-          <p>{cta.description}</p>
+          <h2 className="page-cta__title">{page.ctaTitle}</h2>
+          <p>{page.ctaDescription}</p>
           <div className="page-cta__btns">
             <Link to={cta.primary.to} className="btn-primary">
               {cta.primary.label} <IconArrow size={15} />

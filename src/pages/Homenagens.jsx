@@ -7,6 +7,7 @@ import { useTributes } from '../hooks/useApi'
 import { TRIBUTES_PAGE } from '../data/ui'
 import { PageHero, SkeletonGrid, ErrorState } from '../components/ui'
 import { IconArrow, IconClose, IconInstagram, IconPlay } from '../components/icons'
+import { useSiteContent } from '../content/SiteContent'
 
 // ─── Story Modal ─────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ export default function Homenagens() {
   const [storyIdx,  setStoryIdx]  = useState(0)
 
   const { tributes, loading, error, reload } = useTributes()
+  const { general, contact } = useSiteContent()
 
   const featured = tributes.filter(t => t.featured)
 
@@ -68,7 +70,7 @@ export default function Homenagens() {
         />
       )}
 
-      <PageHero {...TRIBUTES_PAGE.hero} />
+      <PageHero {...TRIBUTES_PAGE.hero} subtitle={general.tributesSubtitle} />
 
       {loading ? (
         <section className="hom-grid-section"><SkeletonGrid count={6} variant="cards" /></section>
@@ -154,8 +156,8 @@ export default function Homenagens() {
         <div className="hom-cta__inner">
           <h2 className="hom-cta__title">{TRIBUTES_PAGE.cta.title}<br /><span>{TRIBUTES_PAGE.cta.titleAccent}</span></h2>
           <p className="hom-cta__desc">{TRIBUTES_PAGE.cta.description}</p>
-          <a href={TRIBUTES_PAGE.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
-            <IconInstagram size={18} /> {TRIBUTES_PAGE.cta.button}
+          <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <IconInstagram size={18} /> {contact.instagramHandle}
           </a>
         </div>
       </section>

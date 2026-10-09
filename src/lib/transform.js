@@ -80,10 +80,14 @@ export function transformPost(p, allPosts = []) {
   allPosts.forEach(post => { idToSlug[post.id] = post.slug })
 
   const rawBody = Array.isArray(p.body) ? p.body : []
-  const body = rawBody.map(block => ({
-    type: block.type === 'quote' ? 'quote' : 'p',
-    text: block.content || block.text || '',  // handles both admin form format and seed data
-  }))
+  const body = rawBody
+    .map(block => ({
+      type: ['quote', 'heading', 'image'].includes(block.type) ? block.type : 'p',
+      text: block.content || block.text || '',  // handles both admin form format and seed data
+      src: block.src || '',
+      caption: block.caption || '',
+    }))
+    .filter(b => (b.type === 'image' ? b.src : b.text))
 
   return {
     slug: p.slug,
@@ -95,7 +99,8 @@ export function transformPost(p, allPosts = []) {
     featured: !!p.featured,
     lead: p.lead || body[0]?.text || p.excerpt || '',  // DB: lead field
     body,
-    related: (p.related || []).map(id => idToSlug[id]).filter(Boolean),
+    // ids (admin) ou slugs (dados iniciais)
+    related: (p.related || []).map(r => idToSlug[r] || (allPosts.some(x => x.slug === r) ? r : null)).filter(Boolean),
   }
 }
 
@@ -110,7 +115,8 @@ export function transformGalleryItem(item) {
     size: item.size_label || '',               // DB: size_label
     technique: item.technique || '',
     img: item.img_url || null,                 // DB: img_url (was src)
-    priceHref: waHref(item.name, item.id),
+    // getter: usa o número de WhatsApp actual (as definições podem chegar depois das obras)
+    get priceHref() { return waHref(item.name, item.id) },
     h: item.height_hint || 350,               // DB: height_hint (was height)
     grad: item.gradient || DEFAULT_GRAD,       // DB: gradient
   }

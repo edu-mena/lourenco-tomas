@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { WA_DEFAULT_MESSAGE, SOCIAL_LINKS } from '../data/content'
 import { FOOTER_CONTENT, NAV_BRAND } from '../data/ui'
 import { waLink } from '../lib/whatsapp'
 import { IconWhatsApp, SOCIAL_ICONS } from './icons'
+import { useSiteContent, socialLinks } from '../content/SiteContent'
 
 /* ── Footer ─────────────────────────────────────── */
 export function Footer() {
+  const { contact, general } = useSiteContent()
   return (
     <footer className="footer" data-hide-wa>
       <div className="footer__brand">
         <Link to="/" className="footer__logo">{NAV_BRAND.logo}</Link>
-        <p className="footer__tagline">{FOOTER_CONTENT.tagline}</p>
+        <p className="footer__tagline">{general.tagline}</p>
       </div>
       <nav className="footer__nav" aria-label="Rodapé">
         {FOOTER_CONTENT.links.map(({ to, label }) => (
@@ -19,7 +20,7 @@ export function Footer() {
         ))}
       </nav>
       <div className="footer__social">
-        {SOCIAL_LINKS.map(s => {
+        {socialLinks(contact).map(s => {
           const Icon = SOCIAL_ICONS[s.icon]
           return (
             <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.handle}>
@@ -29,7 +30,7 @@ export function Footer() {
         })}
       </div>
       <p className="footer__copy">
-        © {new Date().getFullYear()} Lourenço Tomás · Luanda, Angola
+        © {new Date().getFullYear()} Lourenço Tomás · {contact.locationLabel}
       </p>
     </footer>
   )
@@ -43,6 +44,7 @@ const NUDGE_KEY = 'wa-nudged'
 
 export function WhatsApp() {
   const { pathname } = useLocation()
+  const { contact } = useSiteContent()
   const [pastHero, setPastHero] = useState(false)
   const [overForm, setOverForm] = useState(false)
   const [nudge, setNudge] = useState(false)
@@ -84,7 +86,7 @@ export function WhatsApp() {
   return (
     <a
       className={`wa-float${shown ? ' wa-float--shown' : ''}${nudge && shown ? ' wa-float--nudge' : ''}`}
-      href={waLink(WA_DEFAULT_MESSAGE)}
+      href={waLink(contact.whatsappMessage)}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"

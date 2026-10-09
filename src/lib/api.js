@@ -1,4 +1,5 @@
-const API_BASE = 'https://lightblue-lemur-704992.hostingersite.com/api'
+// VITE_API_BASE permite testar contra uma API local; por omissão, a de produção
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://lightblue-lemur-704992.hostingersite.com/api'
 
 export async function apiFetch(path) {
   const res = await fetch(API_BASE + path)
@@ -30,5 +31,8 @@ export const api = {
   companies: {
     list: () => apiFetch('/companies?with_works=1'),
     get: (id) => apiFetch(`/companies/${id}`),
+  },
+  settings: {
+    all: () => apiFetch('/settings'),
   },
 }

@@ -1,11 +1,18 @@
 import { WA_NUMBER, CONTACT_EMAIL } from '../data/content'
 
+/* Número e email vêm das definições do admin (SiteContentProvider chama
+   setContactConfig); até lá valem os do código. */
+let contact = { whatsappNumber: WA_NUMBER, email: CONTACT_EMAIL }
+export function setContactConfig(c) {
+  contact = { whatsappNumber: c.whatsappNumber || WA_NUMBER, email: c.email || CONTACT_EMAIL }
+}
+
 export function waLink(text) {
-  return `https://wa.me/${WA_NUMBER}${text ? `?text=${encodeURIComponent(text)}` : ''}`
+  return `https://wa.me/${contact.whatsappNumber}${text ? `?text=${encodeURIComponent(text)}` : ''}`
 }
 
 export function mailLink(subject, body) {
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  return `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
 /* rows: [label, value][] — linhas vazias são omitidas; `message` vai no fim, separado */

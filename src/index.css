@@ -3891,3 +3891,22 @@ main:focus { outline: none; }
 @media (max-width: 900px) {
   .about__badge { right: 12px; bottom: 12px; padding: 14px 18px; }
 }
+
+/* Blocos de título e imagem nos artigos (editáveis no admin) */
+.bpost-h2 {
+  font-family: var(--ff-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  line-height: 1.1;
+  color: var(--white);
+  margin: 24px 0 4px;
+}
+.bpost-figure { margin: 16px 0; }
+.bpost-figure img { width: 100%; height: auto; display: block; }
+.bpost-figure figcaption {
+  margin-top: 10px;
+  font-family: var(--ff-accent); font-weight: 300;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.55);
+}

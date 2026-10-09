@@ -92,16 +92,22 @@ export default function BlogPost() {
         <p className="bpost-lead">{post.lead}</p>
 
         <div className="bpost-body" ref={bodyRef}>
-          {post.body.map((block, i) =>
-            block.type === 'quote' ? (
+          {post.body.map((block, i) => {
+            if (block.type === 'quote') return (
               <blockquote key={i} className="bpost-quote">
                 <span className="bpost-quote__mark">"</span>
                 <p>{block.text}</p>
               </blockquote>
-            ) : (
-              <p key={i} className="bpost-p">{block.text}</p>
             )
-          )}
+            if (block.type === 'heading') return <h2 key={i} className="bpost-h2">{block.text}</h2>
+            if (block.type === 'image') return (
+              <figure key={i} className="bpost-figure">
+                <img src={block.src} alt={block.caption} loading="lazy" />
+                {block.caption && <figcaption>{block.caption}</figcaption>}
+              </figure>
+            )
+            return <p key={i} className="bpost-p">{block.text}</p>
+          })}
         </div>
 
         {/* Commission CTA */}

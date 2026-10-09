@@ -5,6 +5,7 @@ import { useGallery } from '../hooks/useApi'
 import GalleryBrowser from '../components/GalleryBrowser'
 import { PageHero } from '../components/ui'
 import { IconArrow } from '../components/icons'
+import { useSiteContent } from '../content/SiteContent'
 
 export default function Obras() {
   // O filtro vive no URL: partilhável e respeitado pelo botão "voltar"
@@ -14,13 +15,14 @@ export default function Obras() {
 
   const [ctaRef, ctaVisible] = useScrollReveal()
   const { items, loading, error, reload } = useGallery()
+  const { general } = useSiteContent()
 
   const count = filter === 'all' ? items.length : items.filter(i => i.cat === filter).length
   const countSuffix = count !== 1 ? WORKS_PAGE.countLabelPlural : WORKS_PAGE.countLabel
 
   return (
     <>
-      <PageHero {...WORKS_PAGE.hero} />
+      <PageHero {...WORKS_PAGE.hero} subtitle={general.worksSubtitle} />
 
       <section className="gallery-section" aria-label="Portfolio completo">
         {!loading && !error && (
